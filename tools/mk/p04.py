@@ -1,0 +1,96 @@
+from lib import *
+CODE, BASE = 'hc', 42
+MT = T('Tap a question, then tap its answer.', 'Ketik satu soalan, kemudian ketik jawapannya.')
+
+def build():
+    L = []
+    def add(i, *a): L.append(level(CODE, i, BASE + i, *a))
+    add(1, 'operations', 'addition', 'adventurer', 'door',
+        T('Door Codes', 'Kod Pintu'),
+        T('Every door in the Hidden City opens with a code. Choose the number plates that add up to the code!', 'Setiap pintu di Bandar Tersembunyi dibuka dengan kod. Pilih plat nombor yang jumlahnya sama dengan kod itu!'),
+        T('Add numbers to reach a target, including three at a time.', 'Menambah nombor untuk mencapai sasaran, termasuk tiga nombor serentak.'),
+        'Keyla', T('Keyla carries a ring of tiny keys.', 'Keyla membawa seutas cincin kunci kecil.'),
+        [balance(20, [8, 12, 5, 7, 9]), balance(47, [18, 29, 15, 22, 9, 31]), balance(200, [45, 75, 80, 60, 95, 35], 3)])
+    add(2, 'number-sense', 'patterns', 'adventurer', 'lanterns',
+        T('Missing Clue', 'Petunjuk Hilang'),
+        T('A clue has fallen off the wall of the secret tunnel. Find the missing number in the pattern!', 'Satu petunjuk telah jatuh dari dinding terowong rahsia. Cari nombor yang hilang dalam pola itu!'),
+        T('Find a missing number in the middle of a pattern.', 'Mencari nombor yang hilang di tengah-tengah pola.'),
+        'Clueless', T('Clueless always finds the answer in the end.', 'Clueless akhirnya sentiasa menjumpai jawapannya.'),
+        [pattern('arith', 6, 6, 5, hidden=2, seed='hc2a'), pattern('arith', 50, -7, 6, hidden=3, seed='hc2b'), pattern('geo', 2, 3, 5, hidden=2, seed='hc2c')])
+    add(3, 'reasoning', 'ratio', 'adventurer', 'picnic',
+        T('Ratio Recipes', 'Resipi Nisbah'),
+        T('The city bakery follows secret recipes made of ratios. Help the baker keep every mix just right!', 'Kedai roti bandar mengikut resipi rahsia yang dibuat daripada nisbah. Bantu tukang roti memastikan setiap adunan tepat!'),
+        T('Use ratios to scale a recipe up.', 'Menggunakan nisbah untuk membesarkan sukatan resipi.'),
+        'Doughy', T('Doughy rises whenever the ratio is right.', 'Doughy naik apabila nisbahnya betul.'),
+        [steps([step(T('A recipe uses 2 cups of flour for every 1 cup of sugar. How much sugar for 6 cups of flour?', 'Satu resipi menggunakan 2 cawan tepung untuk setiap 1 cawan gula. Berapa cawan gula untuk 6 cawan tepung?'), 3, '6/2'),
+                step(T('How many cups are there altogether?', 'Berapa cawan kesemuanya?'), 9, '6+3'),
+                step(T('The mix is poured equally into 3 jars. How many cups in each jar?', 'Adunan dituang sama banyak ke dalam 3 balang. Berapa cawan dalam setiap balang?'), 3, '9/3')],
+               T('A ratio of 2 : 1 means the flour is double the sugar.', 'Nisbah 2 : 1 bermaksud tepung dua kali ganda gula.'), T('6 ÷ 2 = 3 cups of sugar, then 6 + 3 = 9 cups, then 9 ÷ 3 = 3 cups in each jar.', '6 ÷ 2 = 3 cawan gula, kemudian 6 + 3 = 9 cawan, kemudian 9 ÷ 3 = 3 cawan dalam setiap balang.'), 'hc3a'),
+         steps([step(T('A paint mix uses 3 parts red for every 2 parts blue. How many parts of blue for 12 parts of red?', 'Satu adunan cat menggunakan 3 bahagian merah untuk setiap 2 bahagian biru. Berapa bahagian biru untuk 12 bahagian merah?'), 8, '12/3*2'),
+                step(T('How many parts of paint is that altogether?', 'Berapa bahagian cat kesemuanya?'), 20, '12+8'),
+                step(T('The paint is shared equally into 4 tins. How many parts in each tin?', 'Cat itu dikongsi sama banyak ke dalam 4 tin. Berapa bahagian dalam setiap tin?'), 5, '20/4')],
+               T('Find how many groups of 3 are in 12.', 'Cari berapa kumpulan 3 dalam 12.'), T('12 ÷ 3 = 4 groups, so blue is 4 × 2 = 8. Then 12 + 8 = 20, then 20 ÷ 4 = 5.', '12 ÷ 3 = 4 kumpulan, jadi biru ialah 4 × 2 = 8. Kemudian 12 + 8 = 20, kemudian 20 ÷ 4 = 5.'), 'hc3b'),
+         steps([step(T('Juice is 5 parts orange to 3 parts apple. How many parts of apple go with 40 parts of orange?', 'Jus itu 5 bahagian oren kepada 3 bahagian epal. Berapa bahagian epal bersama 40 bahagian oren?'), 24, '40/5*3'),
+                step(T('How many parts of juice are there altogether?', 'Berapa bahagian jus kesemuanya?'), 64, '40+24'),
+                step(T('The juice is poured equally into 8 bottles. How many parts in each bottle?', 'Jus itu dituang sama banyak ke dalam 8 botol. Berapa bahagian dalam setiap botol?'), 8, '64/8')],
+               T('How many groups of 5 are in 40?', 'Berapa kumpulan 5 dalam 40?'), T('40 ÷ 5 = 8 groups, so apple is 8 × 3 = 24. Then 40 + 24 = 64, then 64 ÷ 8 = 8.', '40 ÷ 5 = 8 kumpulan, jadi epal ialah 8 × 3 = 24. Kemudian 40 + 24 = 64, kemudian 64 ÷ 8 = 8.'), 'hc3c')])
+    add(4, 'reasoning', 'ratio', 'adventurer', 'gate',
+        T('Ratio Match', 'Padanan Nisbah'),
+        T('The gate guards only let you through if you spot ratios that are the same!', 'Pengawal pintu hanya membenarkan anda lalu jika anda dapat mengesan nisbah yang sama!'),
+        T('Match equivalent ratios.', 'Memadankan nisbah setara.'),
+        'Ratio-Rat', T('Ratio-Rat spots a matching pair from a mile away.', 'Ratio-Rat dapat mengesan pasangan yang sepadan dari jauh.'),
+        [match([('1 : 2', '2 : 4'), ('1 : 3', '3 : 9'), ('2 : 3', '4 : 6')], T('Tap a ratio, then tap the ratio that is equal to it.', 'Ketik satu nisbah, kemudian ketik nisbah yang sama nilainya.'), T('Multiply both numbers by the same amount.', 'Darabkan kedua-dua nombor dengan nilai yang sama.')),
+         match([('2 : 5', '4 : 10'), ('3 : 4', '9 : 12'), ('1 : 5', '4 : 20'), ('5 : 2', '10 : 4')], T('Tap a ratio, then tap the ratio that is equal to it.', 'Ketik satu nisbah, kemudian ketik nisbah yang sama nilainya.'), T('Multiply both numbers by the same amount.', 'Darabkan kedua-dua nombor dengan nilai yang sama.')),
+         match([('6 : 8', '3 : 4'), ('10 : 15', '2 : 3'), ('12 : 20', '3 : 5'), ('9 : 6', '3 : 2'), ('15 : 5', '3 : 1')], T('Tap a ratio, then tap the ratio that is equal to it.', 'Ketik satu nisbah, kemudian ketik nisbah yang sama nilainya.'), T('Divide both numbers by the same amount to make the ratio simpler.', 'Bahagikan kedua-dua nombor dengan nilai yang sama untuk memudahkan nisbah.'))])
+    add(5, 'number-sense', 'place-value', 'adventurer', 'chest',
+        T('Number Lock', 'Kunci Nombor'),
+        T('The vault in the Hidden City has a number lock. Arrange the digits to make the right code!', 'Peti besi di Bandar Tersembunyi mempunyai kunci nombor. Susun digit untuk membentuk kod yang betul!'),
+        T('Make the largest or smallest number from digit tiles.', 'Membentuk nombor terbesar atau terkecil daripada jubin digit.'),
+        'Lockjaw', T('Lockjaw never forgets a combination.', 'Lockjaw tidak pernah lupa kombinasi.'),
+        [digitarrange([4, 1, 7, 9], 'largest'), digitarrange([5, 0, 8, 2, 6], 'smallest'), digitarrange([7, 0, 0, 4, 9], 'smallest')])
+    add(6, 'operations', 'sharing', 'adventurer', 'picnic',
+        T('Street Share', 'Perkongsian Jalan'),
+        T('The street sellers share their berries fairly. Help them divide them between the baskets!', 'Para penjual jalanan berkongsi beri mereka dengan adil. Bantu mereka membahagikannya antara bakul!'),
+        T('Share equally using division facts.', 'Berkongsi sama banyak menggunakan fakta bahagi.'),
+        'Alley', T('Alley knows every shortcut in the city.', 'Alley tahu setiap jalan pintas di bandar.'),
+        [share(16, 4), share(25, 5), share(30, 3)])
+    add(7, 'operations', 'money', 'adventurer', 'ferry',
+        T('Cipher Coins', 'Syiling Sifir'),
+        T('The ferry toll is written in secret code. Pay it with exactly the right coins!', 'Tambang feri ditulis dalam kod rahsia. Bayarnya dengan syiling yang tepat!'),
+        T('Make exact amounts of money.', 'Membentuk jumlah wang yang tepat.'),
+        'Jingle', T('Jingle keeps all the coins sorted by size.', 'Jingle menyusun semua syiling mengikut saiz.'),
+        [coins(95, [5, 10, 20, 50]), coins(270, [10, 20, 50, 100], 4), coins(565, [5, 10, 20, 50, 100], 8)])
+    add(8, 'shape-data', 'shapes', 'master', 'windmill',
+        T('Mystery Shapes', 'Bentuk Misteri'),
+        T('Strange shapes are painted on the rooftops. Spot the ones with the right number of sides!', 'Bentuk yang pelik dilukis di atas bumbung. Kenal pasti bentuk yang mempunyai bilangan sisi yang betul!'),
+        T('Count sides of many shapes, even when turned.', 'Mengira sisi pelbagai bentuk, walaupun diputar.'),
+        'Shapely', T('Shapely draws on every rooftop at night.', 'Shapely melukis di setiap bumbung pada waktu malam.'),
+        [shapes_sides(4, [{'k': 'quad', 'type': 'square', 'color': 'coral'}, {'k': 'poly', 'sides': 3, 'color': 'sky'}, {'k': 'quad', 'type': 'kite', 'color': 'mint'}, {'k': 'circle', 'color': 'sun'}, {'k': 'rect', 'w': 3, 'h': 2, 'color': 'grape'}, {'k': 'poly', 'sides': 5, 'color': 'sky'}], 'quadrilaterals', 'sisi empat'),
+         shapes_sides(6, [{'k': 'poly', 'sides': 6, 'color': 'coral'}, {'k': 'poly', 'sides': 5, 'color': 'sky'}, {'k': 'poly', 'sides': 6, 'rot': 30, 'color': 'mint'}, {'k': 'poly', 'sides': 8, 'color': 'sun'}, {'k': 'quad', 'type': 'rhombus', 'color': 'grape'}, {'k': 'poly', 'sides': 6, 'rot': 90, 'color': 'sky'}], 'hexagons', 'heksagon'),
+         shapes_sides(5, [{'k': 'poly', 'sides': 5, 'color': 'coral'}, {'k': 'poly', 'sides': 5, 'rot': 36, 'color': 'sky'}, {'k': 'poly', 'sides': 6, 'color': 'mint'}, {'k': 'poly', 'sides': 7, 'color': 'sun'}, {'k': 'poly', 'sides': 5, 'rot': 72, 'color': 'grape'}, {'k': 'quad', 'type': 'trapezium', 'color': 'sky'}], 'pentagons', 'pentagon')])
+    add(9, 'shape-data', 'data', 'master', 'lighthouse',
+        T('City Chart', 'Carta Bandar'),
+        T('The city watchers counted the visitors. Read the chart to unlock the next gate!', 'Pemerhati bandar mengira pelawat. Baca carta untuk membuka pintu seterusnya!'),
+        T('Read bar charts: differences, totals and averages.', 'Membaca carta palang: beza, jumlah dan purata.'),
+        'Watcher', T('Watcher never blinks while counting.', 'Watcher tidak berkelip semasa mengira.'),
+        [chart([(T('Bakers', 'Tukang roti'), 14, 'coral'), (T('Clockmakers', 'Pembuat jam'), 9, 'sky'), (T('Painters', 'Pelukis'), 6, 'mint')], ('diff', 0, 2), T('visitors', 'pelawat')),
+         chart([(T('Bakers', 'Tukang roti'), 35, 'coral'), (T('Clockmakers', 'Pembuat jam'), 20, 'sky'), (T('Painters', 'Pelukis'), 45, 'mint'), (T('Mapmakers', 'Pembuat peta'), 30, 'sun')], ('sum', [0, 2]), T('visitors', 'pelawat')),
+         chart([(T('Bakers', 'Tukang roti'), 42, 'coral'), (T('Clockmakers', 'Pembuat jam'), 30, 'sky'), (T('Painters', 'Pelukis'), 54, 'mint'), (T('Mapmakers', 'Pembuat peta'), 36, 'sun'), (T('Singers', 'Penyanyi'), 48, 'grape')], ('mean',), T('visitors', 'pelawat'))])
+    add(10, 'reasoning', 'multi-step', 'master', 'lighthouse',
+        T('The Hidden Treasure', 'Harta Karun Tersembunyi'),
+        T('You found the last clue! Solve three puzzles in a row to reveal the Hidden City treasure.', 'Anda menemui petunjuk terakhir! Selesaikan tiga teka-teki berturut-turut untuk menemui harta karun Bandar Tersembunyi.'),
+        T('Multi-step problems with ratio, money and sharing.', 'Masalah berbilang langkah dengan nisbah, wang dan perkongsian.'),
+        'Goldie', T('Goldie sparkles brighter than the treasure.', 'Goldie berkilau lebih terang daripada harta karun itu.'),
+        [steps([step(T('The treasure has 36 coins. 1 part in 3 belongs to the mayor. How many coins is that?', 'Harta karun itu mempunyai 36 syiling. 1 bahagian daripada 3 milik datuk bandar. Berapa syiling itu?'), 12, '36/3'),
+                step(T('How many coins are left for the others?', 'Berapa syiling yang tinggal untuk yang lain?'), 24, '36-12'),
+                step(T('The others share equally between 4 people. How many coins each?', 'Yang lain berkongsi sama banyak antara 4 orang. Berapa syiling setiap seorang?'), 6, '24/4')],
+               T('Divide by 3 first, then subtract, then share.', 'Bahagi dengan 3 dahulu, kemudian tolak, kemudian kongsi.'), T('36 ÷ 3 = 12, then 36 − 12 = 24, then 24 ÷ 4 = 6.', '36 ÷ 3 = 12, kemudian 36 − 12 = 24, kemudian 24 ÷ 4 = 6.'), 'hc10a'),
+         steps([step(T('A map costs RM7 and a lamp costs RM9. What do 4 maps cost?', 'Sebuah peta berharga RM7 dan sebuah lampu berharga RM9. Berapa harga 4 peta?'), 28, '4*7', lambda v: f'RM{v}'),
+                step(T('What do 3 lamps cost?', 'Berapa harga 3 lampu?'), 27, '3*9', lambda v: f'RM{v}'),
+                step(T('You pay with RM100 for both. How much change do you get?', 'Anda membayar dengan RM100 untuk kedua-duanya. Berapa baki yang anda terima?'), 45, '100-28-27', lambda v: f'RM{v}')],
+               T('Work out each cost, then take both from RM100.', 'Kira setiap harga, kemudian tolak kedua-duanya daripada RM100.'), T('4 × 7 = 28, 3 × 9 = 27, then 100 − 28 − 27 = 45.', '4 × 7 = 28, 3 × 9 = 27, kemudian 100 − 28 − 27 = 45.'), 'hc10b'),
+         steps([step(T('Keys are in the ratio 3 : 5 for gold to silver. How many silver keys go with 18 gold keys?', 'Kunci berada dalam nisbah 3 : 5 untuk emas kepada perak. Berapa kunci perak bersama 18 kunci emas?'), 30, '18/3*5'),
+                step(T('How many keys are there altogether?', 'Berapa kunci kesemuanya?'), 48, '18+30'),
+                step(T('The keys are packed equally into 6 chests. How many keys in each chest?', 'Kunci itu dipek sama banyak ke dalam 6 peti. Berapa kunci dalam setiap peti?'), 8, '48/6')],
+               T('How many groups of 3 are in 18?', 'Berapa kumpulan 3 dalam 18?'), T('18 ÷ 3 = 6 groups, so silver is 6 × 5 = 30. Then 18 + 30 = 48, then 48 ÷ 6 = 8.', '18 ÷ 3 = 6 kumpulan, jadi perak ialah 6 × 5 = 30. Kemudian 18 + 30 = 48, kemudian 48 ÷ 6 = 8.'), 'hc10c')])
+    return L

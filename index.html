@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#bfe9ff">
+  <meta name="description" content="Mathipelago: a bilingual (English / Bahasa Melayu) maths adventure for ages 7–12.">
+  <title>Mathipelago — The Number Islands</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%235fb8ff' stroke='%232b2350' stroke-width='4'/%3E%3Ctext x='32' y='44' font-size='34' font-weight='900' text-anchor='middle' fill='%23fff'%3E%CF%80%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Everything the game draws goes inside #app. #overlay holds dialogs. #boot is the loading / error state. -->
+  <div id="app"></div>
+  <div id="overlay"></div>
+  <div id="boot" class="boot" role="status">
+    <div><div class="dots" aria-hidden="true"></div><div id="boot-msg">Loading… / Memuatkan…</div>
+      <noscript><p>Mathipelago needs JavaScript. / Mathipelago memerlukan JavaScript.</p></noscript></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/locales/en.js"></script>
+  <script src="js/locales/ms.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/streak.js"></script>
+  <script src="js/changelog.js"></script>
+  <script src="js/friends.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/adaptive.js"></script>
+  <script src="js/packs.js"></script>
+  <script src="js/entitlements.js"></script>
+  <script src="js/levels/registry.js"></script>
+  <script src="js/levels/meadow.js"></script>
+  <script src="js/levels/forest.js"></script>
+  <script src="js/levels/cove.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/puzzles.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

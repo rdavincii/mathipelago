@@ -1,0 +1,93 @@
+from lib import *
+CODE, BASE = 'sm', 62
+
+def build():
+    L = []
+    def add(i, *a): L.append(level(CODE, i, BASE + i, *a))
+    add(1, 'operations', 'money', 'adventurer', 'chest',
+        T('Price Tags', 'Tanda Harga'),
+        T('Every spice jar in the market has a price tag. Pay each one with exactly the right coins!', 'Setiap balang rempah di pasar mempunyai tanda harga. Bayar setiap satu dengan syiling yang tepat!'),
+        T('Make exact amounts of money.', 'Membentuk jumlah wang yang tepat.'),
+        'Pepper', T('Pepper sneezes when the price is right.', 'Pepper bersin apabila harganya betul.'),
+        [coins(85, [5, 10, 20, 50]), coins(240, [10, 20, 50, 100]), coins(465, [5, 10, 20, 50, 100], 9)])
+    add(2, 'number-sense', 'length', 'adventurer', 'scale',
+        T('Weigh-In', 'Menimbang'),
+        T('The scales need the right weights. Choose the weights that add up to the total!', 'Penimbang memerlukan pemberat yang betul. Pilih pemberat yang jumlahnya sama dengan jumlah keseluruhan!'),
+        T('Add masses in grams.', 'Menambah jisim dalam gram.'),
+        'Weighty', T('Weighty can lift a whole sack of rice.', 'Weighty boleh mengangkat sekarung beras.'),
+        [balance(500, [200, 300, 150, 250, 100]), balance(1000, [450, 550, 250, 300, 700]), balance(1500, [350, 650, 500, 800, 200, 450], 3)])
+    add(3, 'number-sense', 'length', 'adventurer', 'door',
+        T('Unit Match', 'Padanan Unit'),
+        T('The stalls measure in different units. Match each measurement to the same amount in another unit!', 'Gerai mengukur dalam unit yang berbeza. Padankan setiap ukuran dengan jumlah yang sama dalam unit lain!'),
+        T('Convert metres, kilometres, kilograms and litres.', 'Menukar meter, kilometer, kilogram dan liter.'),
+        'Metrix', T('Metrix carries a tiny ruler everywhere.', 'Metrix membawa pembaris kecil ke mana-mana.'),
+        [match([('1 m', '100 cm'), ('2 m', '200 cm'), ('3 m', '300 cm')], T('Tap a measurement, then tap the same amount in other units.', 'Ketik satu ukuran, kemudian ketik jumlah yang sama dalam unit lain.'), T('There are 100 centimetres in 1 metre.', 'Terdapat 100 sentimeter dalam 1 meter.')),
+         match([('1 km', '1000 m'), ('2 km', '2000 m'), ('500 cm', '5 m'), ('4 km', '4000 m')], T('Tap a measurement, then tap the same amount in other units.', 'Ketik satu ukuran, kemudian ketik jumlah yang sama dalam unit lain.'), T('There are 1000 metres in 1 kilometre.', 'Terdapat 1000 meter dalam 1 kilometer.')),
+         match([('3 kg', '3000 g'), ('4 L', '4000 mL'), ('5000 g', '5 kg'), ('2000 mL', '2 L'), ('7 km', '7000 m')], T('Tap a measurement, then tap the same amount in other units.', 'Ketik satu ukuran, kemudian ketik jumlah yang sama dalam unit lain.'), T('There are 1000 grams in 1 kilogram and 1000 millilitres in 1 litre.', 'Terdapat 1000 gram dalam 1 kilogram dan 1000 mililiter dalam 1 liter.'))])
+    add(4, 'number-sense', 'patterns', 'adventurer', 'lanterns',
+        T('Spice Patterns', 'Corak Rempah'),
+        T('The spice jars are lined up in a pattern. Which jar comes next?', 'Balang rempah disusun dalam satu pola. Balang yang manakah seterusnya?'),
+        T('Continue number patterns that grow, shrink or double.', 'Menyambung pola nombor yang bertambah, berkurang atau berganda.'),
+        'Cumin', T('Cumin smells every jar twice.', 'Cumin menghidu setiap balang dua kali.'),
+        [pattern('arith', 25, 25, 5, seed='sm4a'), pattern('geo', 5, 2, 5, seed='sm4b'), pattern('arith', 1000, -125, 6, seed='sm4c')])
+    add(5, 'operations', 'sharing', 'adventurer', 'picnic',
+        T('Market Share', 'Kongsi Pasar'),
+        T('The fruit seller wants every stall to get the same amount of berries. Share them fairly!', 'Penjual buah mahu setiap gerai mendapat jumlah beri yang sama. Kongsi dengan adil!'),
+        T('Share equally using division facts.', 'Berkongsi sama banyak menggunakan fakta bahagi.'),
+        'Berryn', T('Berryn gives away the biggest berry.', 'Berryn memberikan beri yang paling besar.'),
+        [share(12, 4), share(27, 3), share(30, 5)])
+    add(6, 'operations', 'money', 'adventurer', 'ferry',
+        T('Change Please', 'Baki Tolong'),
+        T('Customers pay with big notes and need their change. Work out each step carefully!', 'Pelanggan membayar dengan wang kertas besar dan memerlukan baki. Kira setiap langkah dengan teliti!'),
+        T('Total costs and give change.', 'Mengira jumlah harga dan memberi baki.'),
+        'Penny', T('Penny always counts the change twice.', 'Penny sentiasa mengira baki dua kali.'),
+        [steps([step(T('A mango costs RM3. What do 4 mangoes cost?', 'Sebiji mangga berharga RM3. Berapa harga 4 biji mangga?'), 12, '4*3', lambda v: f'RM{v}'),
+                step(T('You pay with RM20. How much change do you get?', 'Anda membayar dengan RM20. Berapa baki yang anda terima?'), 8, '20-12', lambda v: f'RM{v}'),
+                step(T('You spend all the change on 2 equal sweets. How much does each sweet cost?', 'Anda membelanjakan semua baki untuk 2 gula-gula yang sama harga. Berapa harga setiap gula-gula?'), 4, '8/2', lambda v: f'RM{v}')],
+               T('Multiply, then subtract, then share.', 'Darab, kemudian tolak, kemudian kongsi.'), T('4 × 3 = 12, then 20 − 12 = 8, then 8 ÷ 2 = 4.', '4 × 3 = 12, kemudian 20 − 12 = 8, kemudian 8 ÷ 2 = 4.'), 'sm6a'),
+         steps([step(T('A bag of rice costs RM8. What do 3 bags cost?', 'Sebeg beras berharga RM8. Berapa harga 3 beg?'), 24, '3*8', lambda v: f'RM{v}'),
+                step(T('A jar of spice costs RM6. What is the total for the rice and the spice?', 'Sebalang rempah berharga RM6. Berapa jumlah untuk beras dan rempah itu?'), 30, '24+6', lambda v: f'RM{v}'),
+                step(T('You pay with RM50. How much change do you get?', 'Anda membayar dengan RM50. Berapa baki yang anda terima?'), 20, '50-30', lambda v: f'RM{v}')],
+               T('Find each cost, then add them.', 'Cari setiap harga, kemudian tambahkannya.'), T('3 × 8 = 24, then 24 + 6 = 30, then 50 − 30 = 20.', '3 × 8 = 24, kemudian 24 + 6 = 30, kemudian 50 − 30 = 20.'), 'sm6b'),
+         steps([step(T('Spice costs RM12 for each kilogram. What do 5 kilograms cost?', 'Rempah berharga RM12 untuk setiap kilogram. Berapa harga 5 kilogram?'), 60, '5*12', lambda v: f'RM{v}'),
+                step(T('The seller takes RM6 off for buying so much. How much do you pay?', 'Penjual memberi potongan RM6 kerana membeli banyak. Berapa yang anda bayar?'), 54, '60-6', lambda v: f'RM{v}'),
+                step(T('You pay with RM100. How much change do you get?', 'Anda membayar dengan RM100. Berapa baki yang anda terima?'), 46, '100-54', lambda v: f'RM{v}')],
+               T('Take the discount off before you work out the change.', 'Tolak potongan sebelum mengira baki.'), T('5 × 12 = 60, then 60 − 6 = 54, then 100 − 54 = 46.', '5 × 12 = 60, kemudian 60 − 6 = 54, kemudian 100 − 54 = 46.'), 'sm6c')])
+    add(7, 'number-sense', 'place-value', 'master', 'door',
+        T('Big Bills', 'Wang Kertas Besar'),
+        T('The market safe holds notes of many sizes. Build the number on the lock!', 'Peti besi pasar menyimpan wang kertas pelbagai saiz. Bina nombor pada kunci itu!'),
+        T('Build numbers up to 9,999 with place value.', 'Membina nombor sehingga 9,999 dengan nilai tempat.'),
+        'Notey', T('Notey folds every note into a tiny boat.', 'Notey melipat setiap wang kertas menjadi bot kecil.'),
+        [placevalue(250, [100, 10, 1]), placevalue(1375, [1000, 100, 10, 1]), placevalue(4680, [1000, 100, 10, 1])])
+    add(8, 'operations', 'times-tables', 'master', 'gears',
+        T('Fruit Boxes', 'Kotak Buah'),
+        T('Fruit is packed in boxes of equal size. Find the two tiles that make each total!', 'Buah dipek dalam kotak yang sama saiz. Cari dua jubin yang membentuk setiap jumlah!'),
+        T('Multiplication facts in context.', 'Fakta darab dalam konteks.'),
+        'Fruity', T('Fruity packs the boxes so neatly.', 'Fruity memek kotak dengan sangat kemas.'),
+        [tiles(30, [5, 6, 8, 3, 4, 7]), tiles(72, [8, 9, 6, 12, 7, 5]), tiles(108, [12, 9, 11, 8, 14, 6])])
+    add(9, 'shape-data', 'data', 'master', 'lighthouse',
+        T('Market Chart', 'Carta Pasar'),
+        T('The stall owners drew a chart of today’s sales. Read it to find the answer!', 'Pemilik gerai melukis carta jualan hari ini. Baca untuk mencari jawapannya!'),
+        T('Read bar charts: differences, totals and averages.', 'Membaca carta palang: beza, jumlah dan purata.'),
+        'Salesy', T('Salesy shouts the best price in town.', 'Salesy melaungkan harga terbaik di bandar.'),
+        [chart([(T('Mangoes', 'Mangga'), 15, 'coral'), (T('Papayas', 'Betik'), 9, 'sun'), (T('Melons', 'Tembikai'), 12, 'mint')], ('diff', 0, 1), T('fruits', 'buah')),
+         chart([(T('Mangoes', 'Mangga'), 40, 'coral'), (T('Papayas', 'Betik'), 25, 'sun'), (T('Melons', 'Tembikai'), 35, 'mint'), (T('Bananas', 'Pisang'), 50, 'sky')], ('sum', [0, 3]), T('fruits', 'buah')),
+         chart([(T('Mangoes', 'Mangga'), 45, 'coral'), (T('Papayas', 'Betik'), 30, 'sun'), (T('Melons', 'Tembikai'), 60, 'mint'), (T('Bananas', 'Pisang'), 55, 'sky'), (T('Grapes', 'Anggur'), 35, 'grape')], ('mean',), T('fruits', 'buah'))])
+    add(10, 'reasoning', 'multi-step', 'master', 'windmill',
+        T('Market Day Finale', 'Kemuncak Hari Pasar'),
+        T('It is the biggest market day of the year! Help the traders with three steps of sums.', 'Ini hari pasar terbesar tahun ini! Bantu para peniaga dengan tiga langkah pengiraan.'),
+        T('Multi-step problems with money, measures and sharing.', 'Masalah berbilang langkah dengan wang, ukuran dan perkongsian.'),
+        'Haggle', T('Haggle always asks for a little discount.', 'Haggle sentiasa meminta sedikit diskaun.'),
+        [steps([step(T('A trader has 4 sacks with 25 kg of rice in each. How many kilograms?', 'Seorang peniaga mempunyai 4 karung dengan 25 kg beras dalam setiap satu. Berapa kilogram?'), 100, '4*25', lambda v: f'{v} kg'),
+                step(T('He sells 35 kg. How many kilograms are left?', 'Dia menjual 35 kg. Berapa kilogram yang tinggal?'), 65, '100-35', lambda v: f'{v} kg'),
+                step(T('The rest is packed into 5 bags equally. How many kilograms in each bag?', 'Bakinya dipek sama banyak ke dalam 5 beg. Berapa kilogram dalam setiap beg?'), 13, '65/5', lambda v: f'{v} kg')],
+               T('Multiply, then subtract, then share.', 'Darab, kemudian tolak, kemudian kongsi.'), T('4 × 25 = 100, then 100 − 35 = 65, then 65 ÷ 5 = 13.', '4 × 25 = 100, kemudian 100 − 35 = 65, kemudian 65 ÷ 5 = 13.'), 'sm10a'),
+         steps([step(T('Juice costs RM4 a bottle. What do 12 bottles cost?', 'Jus berharga RM4 sebotol. Berapa harga 12 botol?'), 48, '12*4', lambda v: f'RM{v}'),
+                step(T('Each bottle holds 2 litres. How many litres are there?', 'Setiap botol memuatkan 2 liter. Berapa liter kesemuanya?'), 24, '12*2', lambda v: f'{v} L'),
+                step(T('The juice is poured equally into 8 jugs. How many litres in each jug?', 'Jus itu dituang sama banyak ke dalam 8 jag. Berapa liter dalam setiap jag?'), 3, '24/8', lambda v: f'{v} L')],
+               T('Work out the cost and the litres separately.', 'Kira harga dan bilangan liter secara berasingan.'), T('12 × 4 = 48, 12 × 2 = 24, then 24 ÷ 8 = 3.', '12 × 4 = 48, 12 × 2 = 24, kemudian 24 ÷ 8 = 3.'), 'sm10b'),
+         steps([step(T('A shop buys 6 crates of 24 oranges each. How many oranges?', 'Sebuah kedai membeli 6 peti dengan 24 biji oren dalam setiap satu. Berapa biji oren?'), 144, '6*24'),
+                step(T('Each orange sells for 50 sen. How many sen is that in total?', 'Setiap biji oren dijual dengan harga 50 sen. Berapa sen jumlahnya?'), 7200, '144*50', lambda v: f'{v} sen'),
+                step(T('How many ringgit is that? (100 sen = RM1)', 'Berapa ringgit itu? (100 sen = RM1)'), 72, '7200/100', lambda v: f'RM{v}')],
+               T('Multiply to find the oranges, then the sen.', 'Darab untuk mencari bilangan oren, kemudian sen.'), T('6 × 24 = 144, then 144 × 50 = 7,200 sen, then 7,200 ÷ 100 = RM72.', '6 × 24 = 144, kemudian 144 × 50 = 7,200 sen, kemudian 7,200 ÷ 100 = RM72.'), 'sm10c')])
+    return L
