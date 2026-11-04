@@ -140,9 +140,10 @@ def main():
         # ---- language switch keeps progress ----
         seed_all_done(pg, 'en', 1)
         before = js(pg, 'JSON.stringify(MP.store.get().levels)')
-        pg.get_by_role('button', name=re.compile('Switch language|Tukar bahasa')).click(); pg.wait_for_timeout(150)
+        js(pg, "MP.app.go('settings')"); pg.wait_for_timeout(200)
+        pg.get_by_role('button', name='Bahasa Melayu', exact=True).click(); pg.wait_for_timeout(150)
         check('quick language switch keeps progress', js(pg, 'JSON.stringify(MP.store.get().levels)') == before and js(pg, 'MP.i18n.lang') == 'ms')
-        pg.get_by_role('button', name=re.compile('Switch language|Tukar bahasa')).click()
+        pg.get_by_role('button', name='English', exact=True).click()
 
         # ---- premium preview (honest) ----
         js(pg, "MP.app.go('map')"); pg.wait_for_timeout(300)

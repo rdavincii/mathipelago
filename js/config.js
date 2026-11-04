@@ -9,7 +9,7 @@
 
   MP.config = {
     gameName: 'Mathipelago',            // provisional name — run a trademark search before launch
-    version: '0.6.0',
+    version: '0.7.0',
 
     // Where the "Exit" button in the main menu sends the player (your website's home / shop page).
     // Hidden automatically when the game is opened straight from a file (file://).

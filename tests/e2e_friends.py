@@ -1,3 +1,4 @@
+import re
 """Friends screen against a MOCKED server (the real one is not reachable from the test sandbox). Usage: python tests/e2e_friends.py [url]"""
 import sys, json
 sys.path.insert(0, __file__.rsplit('/', 1)[0] if '/' in __file__ else '.')
@@ -41,6 +42,10 @@ def main():
         check('friends: cheering once marks it done for today', pg.get_by_role('button', name='Cheered today').count() == 1 and any(c[0] == 'mp_cheer' for c in calls))
         pg.get_by_role('button', name='Accept').dispatch_event('click'); pg.wait_for_timeout(500)
         check('friends: accepting makes them a friend', pg.get_by_role('button', name='Accept').count() == 0 and any(c[0] == 'mp_respond' for c in calls))
+        check('friends: race board shows me and the new friend on lanes', pg.locator('.race .lane').count() >= 2 and pg.locator('.race .lane.you').count() == 1, pg.locator('.race').inner_text() if pg.locator('.race').count() else 'none')
+        js(pg, "MP.app.go('menu')"); pg.wait_for_timeout(200)
+        check('menu: gear button is top right, no language pill, no Settings in the grid', pg.get_by_role('button', name='Settings').count() == 1 and pg.locator('.gearbtn').count() == 1 and pg.get_by_role('button', name=re.compile('Switch language|Tukar bahasa')).count() == 0)
+        js(pg, "MP.app.go('friends')"); pg.wait_for_timeout(500)
         pg.locator('.addrow input').fill('zz9 9x'); pg.get_by_role('button', name='Add friend').click(); pg.wait_for_timeout(400)
         check('friends: a typed code is cleaned to capital letters and numbers', [c for c in calls if c[0] == 'mp_add'][0][1]['p_code'] == 'ZZ99X' and 'Request sent' in pg.locator('.frnote').inner_text())
         check('friends: backup file never carries the online identity', '"token":null' in js(pg, "MP.store.profiles.exportActive()").replace(' ', ''))

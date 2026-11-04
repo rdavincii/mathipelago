@@ -6,6 +6,11 @@
   'use strict';
   var MP = (window.MP = window.MP || {});
   MP.changelog = [
+    { v: '0.7.0', date: '2026-11-04', items: [
+      { en: 'Friends race: see you and your friends racing along a track, ranked by stars.', ms: 'Perlumbaan kawan: lihat anda dan kawan berlumba di landasan, disusun mengikut bintang.' },
+      { en: 'Settings is now a gear at the top right. Your player and Add player can fold away.', ms: 'Tetapan kini ikon gear di penjuru kanan atas. Pemain anda dan Tambah pemain boleh dilipat.' },
+      { en: 'Fixed the map animations freezing on slower phones.', ms: 'Membaiki animasi peta yang tersekat pada telefon yang lebih perlahan.' }
+    ] },
     { v: '0.6.0', date: '2026-11-02', items: [
       { en: 'Online friends: share a friend code, see each other\u2019s stars and pals, and send cheers that give coins. A grown-up turns it on.', ms: 'Kawan dalam talian: kongsi kod kawan, lihat bintang dan kawan masing-masing, dan hantar sorakan yang memberi syiling. Orang dewasa menghidupkannya.' },
       { en: 'Smoother, springier motion: presses, pop-ups and screens now move like a native app.', ms: 'Gerakan lebih lancar dan melantun: tekanan, tetingkap dan skrin kini bergerak seperti aplikasi asli.' }

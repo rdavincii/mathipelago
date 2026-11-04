@@ -12,7 +12,7 @@
     'intro.welcome': 'Selamat datang, pengembara!', 'intro.chooseLang': 'Pilih bahasa anda:', 'intro.next': 'Seterusnya',
     'intro.rankTitle': 'Di manakah kita mahu bermula?', 'intro.rankBody': 'Pilih yang anda rasa sesuai. Permainan ini menyesuaikan diri semasa anda bermain, dan anda boleh menukarnya kemudian.',
     'intro.start': 'Jom main!',
-    'lang.choose': 'Bahasa', 'lang.switch': 'Tukar bahasa',
+    'lang.choose': 'Bahasa',
     'band.explorer': 'Peneroka', 'band.explorer.ages': 'Umur 7–8, permulaan mudah',
     'band.adventurer': 'Pengembara', 'band.adventurer.ages': 'Umur 9–10, cabaran yang sesuai',
     'band.master': 'Peneroka Mahir', 'band.master.ages': 'Umur 11–12, teka-teki lebih besar',
@@ -314,6 +314,10 @@
     "fr.turnOffTitle": "Matikan kawan dalam talian?",
     "fr.turnOffBody": "Pemain ini berhenti berkongsi dan keluar dari senarai kawan pada peranti ini. Kod baharu dibuat jika dihidupkan semula.",
     "fr.turnOffYes": "Matikan",
+    "fr.raceTitle": "Perlumbaan kawan",
+    "fr.racePlace": "Anda di tempat #{a} daripada {b}",
+    "fr.you": "Anda",
+    "fr.raceNote": "Bintang menentukan kedudukan. Landasan menunjukkan tahap yang telah tamat.",
     "map.levelN": "Tahap {n}:"
   });
 })();

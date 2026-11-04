@@ -130,3 +130,9 @@ Also: oval **EN | BM** switch, **Pal Park** (pet, treat, play with, and take a p
   Until you run it the screen cannot decline or remove friends.
 * **Motion:** springy presses, sheet-style pop-ups, screens that ease in and staggered menu/list entrances. "Calmer" in Settings and the device's reduce-motion setting stop it.
 * **Privacy note for publishing:** with friends on, the game is no longer fully offline for that player. Update your privacy text, and check the rules for children's data in the countries you sell in (for Malaysia, PDPA) before launch.
+
+## v0.7.0
+- Friends race dashboard (lanes ranked by stars, track shows levels finished).
+- Settings gear at top right of the menu (replaces the language pill; language is in Settings).
+- "Your player" and "Add player" sections collapse.
+- Map animations pause when off-screen: about 360 running animations down to about 25, 11 to 23 fps at 6x CPU slowdown.

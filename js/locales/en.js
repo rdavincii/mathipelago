@@ -12,7 +12,7 @@
     'intro.welcome': 'Welcome, explorer!', 'intro.chooseLang': 'Choose your language:', 'intro.next': 'Next',
     'intro.rankTitle': 'Where shall we start?', 'intro.rankBody': 'Pick what feels right. The game adjusts as you play, and you can change this later.',
     'intro.start': "Let's play!",
-    'lang.choose': 'Language', 'lang.switch': 'Switch language',
+    'lang.choose': 'Language',
     'band.explorer': 'Explorer', 'band.explorer.ages': 'Ages 7–8, friendly start',
     'band.adventurer': 'Adventurer', 'band.adventurer.ages': 'Ages 9–10, a good challenge',
     'band.master': 'Master Explorer', 'band.master.ages': 'Ages 11–12, bigger puzzles',
@@ -314,6 +314,10 @@
     "fr.turnOffTitle": "Turn off online friends?",
     "fr.turnOffBody": "This player stops sharing and leaves the friends list on this device. A new code is made if you turn it on again.",
     "fr.turnOffYes": "Turn off",
+    "fr.raceTitle": "Friends race",
+    "fr.racePlace": "You are #{a} of {b}",
+    "fr.you": "You",
+    "fr.raceNote": "Stars decide the order. The track shows levels finished.",
     "map.levelN": "Level {n}:"
   });
 })();

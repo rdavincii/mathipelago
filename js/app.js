@@ -163,14 +163,8 @@
   }
 
   /** Oval EN | BM switch: the label sits inside a pill that grows to fit, so text never overflows. */
-  function langPill() {
-    var en = MP.i18n.lang === 'en';
-    var label = el('span', { class: 'pillinner', attrs: { 'aria-hidden': 'true' } }, [
-      el('span', { class: 'lp' + (en ? ' on' : ''), text: 'EN' }), el('span', { class: 'lp' + (en ? '' : ' on'), text: 'BM' })]);
-    return btn('pill', label, function () {
-      S.update(function (sv) { sv.lang = MP.i18n.lang === 'en' ? 'ms' : 'en'; }); applySettings(); rerender();
-    }, { 'aria-label': t('lang.switch') + ': ' + (en ? 'Bahasa Melayu' : 'English') });
-  }
+  var GEAR_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M10.4 3h3.2l.5 2.4 1.7.7 2.1-1.3 2.3 2.3-1.3 2.1.7 1.7 2.4.5v3.2l-2.4.5-.7 1.7 1.3 2.1-2.3 2.3-2.1-1.3-1.7.7-.5 2.4h-3.2l-.5-2.4-1.7-.7-2.1 1.3-2.3-2.3 1.3-2.1-.7-1.7L3 13.6v-3.2l2.4-.5.7-1.7-1.3-2.1 2.3-2.3 2.1 1.3 1.7-.7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+  function settingsGear() { return btn('round ghost gearbtn', icon(GEAR_SVG), function () { go('settings'); }, { 'aria-label': t('menu.settings') }); }
 
   function langButtons() {
     var wrap = el('div', { class: 'langs', attrs: { role: 'group', 'aria-label': t('lang.choose') } });
@@ -295,6 +289,32 @@
       el('div', { class: 'facts' }, actions)
     ]);
   }
+
+  /** Race dashboard: you and your accepted friends on one track. Stars decide the order; the track shows levels finished. */
+  function raceBoard(friends) {
+    var mine = (function () { var st = 0, dn = 0, sv = S.get(); Object.keys(sv.levels).forEach(function (k) { st += sv.levels[k].stars; if (sv.levels[k].done) dn++; }); return { you: true, name: sv.name || t('prof.player'), avatar: sv.avatar, stars: st, levels: dn }; })();
+    var rows = friends.filter(function (f) { return f.status === 'friend'; }).concat([mine]);
+    if (rows.length < 2) return null;
+    rows.sort(function (a, b) { return b.stars - a.stars || b.levels - a.levels; });
+    var top = Math.max.apply(null, rows.map(function (r) { return r.levels; })), goal = Math.max(10, Math.ceil(top / 0.9));
+    var place = rows.indexOf(mine) + 1;
+    var lanes = el('ol', { class: 'lanes' });
+    rows.forEach(function (r, i) {
+      var tok = el('span', { class: 'racer', attrs: { 'aria-hidden': 'true' } }, [icon(r.pal && r.pal.look ? A.creature(r.pal.look, { acc: r.pal.acc === null ? undefined : r.pal.acc, tint: r.pal.tint }) : A.avatar(r.avatar, ''), 'rtok')]);
+      var track = el('div', { class: 'track' }, [el('span', { class: 'fill' }), tok, el('span', { class: 'flag', attrs: { 'aria-hidden': 'true' }, text: '⚑' })]);
+      var pct = Math.min(100, Math.round(100 * r.levels / goal));
+      track.style.setProperty('--to', pct + '%');
+      var lane = el('li', { class: 'lane' + (r.you ? ' you' : '') + (i === 0 ? ' lead' : '') }, [
+        el('span', { class: 'rank', text: '#' + (i + 1) }),
+        el('div', { class: 'lanebody' }, [el('div', { class: 'lanehead' }, [el('b', { text: r.you ? t('fr.you') + ' · ' + r.name : r.name }), el('small', { text: t('fr.stats', { a: r.stars, b: r.levels }) })]), track])
+      ]);
+      lane.setAttribute('aria-label', '#' + (i + 1) + ' ' + r.name + ', ' + t('fr.stats', { a: r.stars, b: r.levels }));
+      lane.style.setProperty('--i', i); lanes.appendChild(lane);
+    });
+    requestAnimationFrame(function () { requestAnimationFrame(function () { lanes.classList.add('go'); }); });   // tokens glide from the start line
+    return el('section', { class: 'race' }, [el('h2', { text: t('fr.raceTitle') }), el('p', { class: 'note', text: t('fr.racePlace', { a: place, b: rows.length }) }), lanes, el('p', { class: 'note', text: t('fr.raceNote') })]);
+  }
+
   function askGrownUp(onOk) {
     var a = 6 + Math.floor(Math.random() * 4), b = 5 + Math.floor(Math.random() * 4);
     var inp = nameInput('', '?', t('fr.gateLabel')); inp.inputMode = 'numeric'; inp.maxLength = 2;
@@ -319,10 +339,12 @@
     var codeBox = el('div', { class: 'mycode' }, [el('small', { text: t('fr.yourCode') }), el('b', { class: 'code', text: MP.friends.code() }),
       btn('small', t('fr.copy'), function (e) { try { navigator.clipboard.writeText(MP.friends.code()); e.currentTarget.textContent = t('fr.copied'); } catch (x) { /* shown on screen anyway */ } })]);
     var inp = nameInput('', 'ABC234', t('fr.codeLabel')); inp.maxLength = 6; inp.autocapitalize = 'characters';
+    var raceBox = el('div', { class: 'racebox' });
     function refresh() {
       MP.friends.sync(); MP.friends.list().then(function (r) {
         if (current.name !== 'friends') return;
-        list.textContent = '';
+        list.textContent = ''; raceBox.textContent = '';
+        if (r.ok) { var rb = raceBoard(r.data); if (rb) raceBox.appendChild(rb); }
         if (!r.ok) { note.textContent = t('fr.offline'); return; }
         if (!r.data.length) list.appendChild(el('li', { class: 'fempty', text: t('fr.empty') }));
         r.data.forEach(function (f, i) { var c = friendCard(f, refresh); c.style.setProperty('--i', i); list.appendChild(c); });
@@ -339,7 +361,7 @@
     inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') addIt(); });
     main.appendChild(codeBox);
     main.appendChild(el('div', { class: 'addrow' }, [inp, btn('primary', t('fr.add'), addIt)]));
-    main.appendChild(note); main.appendChild(list);
+    main.appendChild(note); main.appendChild(raceBox); main.appendChild(list);
     main.appendChild(el('p', { class: 'note', text: t('fr.privacy') }));
     main.appendChild(el('div', { class: 'setrow' }, [btn('ghost danger', t('fr.turnOff'), function () { MP.ui.confirm({ title: t('fr.turnOffTitle'), body: t('fr.turnOffBody'), yes: t('fr.turnOffYes'), no: t('cancel'), onYes: function () { MP.friends.turnOff(); go('friends'); } }); })]));
     // cheers received since last time become coins (2 each), then show the list
@@ -381,7 +403,7 @@
     return el('main', { class: 'screen menu' }, [
       el('div', { class: 'menu-bg', svg: A.scene('windmill', 'meadow') }),
       el('div', { class: 'menu-top' }, [btn('profilechip', el('span', { class: 'pchipin' }, [avatarIcon(sv.avatar), el('b', { text: sv.name || t('prof.player') })]), function () { go('profiles'); }, { 'aria-label': t('prof.title') + ': ' + (sv.name || t('prof.player')) }),
-        el('span', { class: 'spacer' }), soundToggle(), musicToggle(), langPill()]),
+        el('span', { class: 'spacer' }), soundToggle(), musicToggle(), settingsGear()]),
       el('div', { class: 'menu-center' }, [
         el('div', { class: 'logo', svg: A.logo() }),
         el('div', { class: 'nimbo-row' }, [icon(A.nimbo({ mood: 'idle', hat: equippedHat(), cls: 'big fly' }), 'nimbo-wrap'),
@@ -399,7 +421,6 @@
           btn('', t('menu.pals'), function () { go('pals'); }),
           MP.friends.available() ? btn('', t('menu.friends'), function () { go('friends'); }) : null,
           btn('', t('menu.collectionHats'), function () { go('collection'); }),
-          btn('', t('menu.settings'), function () { go('settings'); }),
           btn('', t('menu.parents'), function () { go('parents'); })
         ]),
         testBanner(),
@@ -518,6 +539,14 @@
     var toastEl = el('div', { class: 'toast', attrs: { role: 'status', 'aria-live': 'polite' } });
     function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); scope.timeout(function () { toastEl.classList.remove('show'); }, 2200); }
 
+    // The premium map has hundreds of looping animations. Only the ones on screen keep running, so slow phones stay smooth.
+    scope.timeout(function () {
+      if (!window.IntersectionObserver || !map.getAnimations) return;
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { e.target.style.animationPlayState = e.isIntersecting ? '' : 'paused'; }); }, { rootMargin: '120px 0px' });
+      var seen = [];
+      map.getAnimations({ subtree: true }).forEach(function (a) { var tg = a.effect && a.effect.target; if (tg && tg.style && seen.indexOf(tg) === -1) { seen.push(tg); io.observe(tg); } });
+      scope.add(function () { io.disconnect(); });
+    }, 120);
     scope.timeout(function () {
       if (focusNode && focusNode.scrollIntoView) { try { focusNode.scrollIntoView({ block: 'center', behavior: 'auto' }); } catch (e) { /* ignore */ } }
     }, 30);
@@ -881,6 +910,13 @@
 
 
   /* ---------------- players (profiles): switch, add, rename, back up ---------------- */
+  var folds = {};      // which Players sections the child left open (kept while the game is open)
+  function fold(title, key, kids) {
+    var d = el('details', { class: 'psec fold' }, [el('summary', { text: title })].concat(kids));
+    if (folds[key]) d.open = true;
+    d.addEventListener('toggle', function () { folds[key] = d.open; });
+    return d;
+  }
   SCREENS.profiles = function (p, scope) {
     var sv = S.get(), P = S.profiles, list = P.list();
     var status = el('p', { class: 'note', attrs: { role: 'status', 'aria-live': 'polite' }, text: '' });
@@ -892,7 +928,7 @@
     var ap = avatarPicker(sv.avatar);
     function saveMe() { S.update(function (s) { s.name = S.cleanName(ni.value); s.avatar = ap.get(); }); MP.audio.play('tap'); go('profiles'); }
     ni.addEventListener('keydown', function (e) { if (e.key === 'Enter') saveMe(); });
-    var me = el('section', { class: 'psec' }, [el('h2', { text: t('prof.editTitle') }), el('label', { class: 'note', text: t('prof.name') }), ni, ap.node,
+    var me = fold(t('prof.editTitle'), 'me', [el('label', { class: 'note', text: t('prof.name') }), ni, ap.node,
       el('div', { class: 'btnrow wrap' }, [btn('primary', t('prof.save'), saveMe),
         btn('ghost danger', t('prof.delete'), function () {
           if (P.count() <= 1) { say(t('prof.lastOne')); return; }
@@ -915,8 +951,8 @@
     }
     nn.addEventListener('keydown', function (e) { if (e.key === 'Enter') addIt(); });
     var add = P.canAdd()
-      ? el('section', { class: 'psec' }, [el('h2', { text: t('prof.add') }), nn, na.node, btn('primary', t('prof.addBtn'), addIt)])
-      : el('section', { class: 'psec' }, [el('h2', { text: t('prof.add') }), el('p', { class: 'note', text: t('prof.full', { n: S.MAX_PROFILES }) })]);
+      ? fold(t('prof.add'), 'add', [nn, na.node, btn('primary', t('prof.addBtn'), addIt)])
+      : fold(t('prof.add'), 'add', [el('p', { class: 'note', text: t('prof.full', { n: S.MAX_PROFILES }) })]);
 
     // backup
     var file = document.createElement('input'); file.type = 'file'; file.accept = '.json,application/json'; file.className = 'sr-only'; file.setAttribute('aria-label', t('prof.import'));

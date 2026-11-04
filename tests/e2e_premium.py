@@ -55,17 +55,9 @@ def main():
         js(pg, "MP.store.update(s=>{s.introDone=true;s.tutorialDone=true;s.lang='en'}); MP.app.go('menu')"); pg.wait_for_timeout(200)
         check('test banner is visible on the menu', pg.locator('.testbanner').count() == 1)
 
-        # oval EN | BM button
-        pill = pg.locator('.btn.pill')
-        info = js(pg, """()=>{const b=document.querySelector('.btn.pill'), r=b.getBoundingClientRect(), cs=getComputedStyle(b), inner=b.querySelector('.pillinner').getBoundingClientRect();
-          return {w:r.width,h:r.height,rad:parseFloat(cs.borderTopLeftRadius),sw:b.scrollWidth,cw:b.clientWidth,fits:inner.left>=r.left&&inner.right<=r.right}}""")
-        check('EN|BM button is an oval wider than tall', info['w'] > info['h'] * 1.4 and info['rad'] >= info['h'] / 2 - 1, info)
-        check('EN|BM text fits inside the oval', info['fits'] and info['sw'] <= info['cw'] + 1, info)
-        check('EN|BM tap target is at least 44px', info['h'] >= 44 and info['w'] >= 44)
-        pill.click(); pg.wait_for_timeout(250)
-        check('tapping the oval switches to Bahasa Melayu', js(pg, 'MP.i18n.lang') == 'ms' and pg.get_by_role('button', name='Papan pemuka').count() == 1)
-        pg.locator('.btn.pill').click(); pg.wait_for_timeout(250)
-        check('tapping again switches back to English', js(pg, 'MP.i18n.lang') == 'en')
+        # gear button replaces the language pill
+        g = js(pg, """()=>{const b=document.querySelector('.gearbtn'); if(!b) return null; const r=b.getBoundingClientRect(); return {w:r.width,h:r.height,right:innerWidth-r.right,top:r.top}}""")
+        check('menu gear button is top right with a 44px tap target', g and g['w'] >= 44 and g['h'] >= 44 and g['right'] < 40 and g['top'] < 120, g)
         sub = js(pg, """()=>{const t=[...document.querySelectorAll('.logo svg text')].find(x=>/NUMBER/i.test(x.textContent)); const rect=t.previousElementSibling; return {fill:t.getAttribute('fill'), bg: rect? rect.getAttribute('fill'):null}}""")
         check('logo subtitle is light text on a dark pill (readable on any background)', sub['fill'].lower() in ('#fff', '#ffffff', 'white') and sub['bg'], sub)
 
@@ -176,7 +168,10 @@ def main():
         check('menu greets the player and shows their avatar chip', pg.locator('.hello').inner_text() == 'Hi, Aina!' and pg.locator('.profilechip').count() == 1)
         pg.locator('.profilechip').click(); pg.wait_for_timeout(250)
         check('players screen lists the player as playing now', pg.locator('.pcard.on').count() == 1)
-        pg.locator('.profiles .psec').nth(2).locator('.nameinput').fill('Danish')
+        check('players: your player and add player start collapsed', js(pg, "document.querySelectorAll('.profiles details.fold[open]').length") == 0)
+        pg.locator('.profiles details.fold').last.locator('summary').click(); pg.wait_for_timeout(150)
+        check('players: tapping the heading opens it', js(pg, "document.querySelectorAll('.profiles details.fold[open]').length") == 1)
+        pg.locator('.profiles details.fold').last.locator('.nameinput').fill('Danish')
         pg.locator('.profiles .psec').nth(2).locator('.avbtn').nth(2).click()
         pg.get_by_role('button', name='Create player').click(); pg.wait_for_timeout(300)
         check('adding a player switches to them with a clean save', js(pg, "MP.store.get().name") == 'Danish' and js(pg, "MP.store.get().coins") == 0 and js(pg, "Object.keys(MP.store.get().levels).length") == 0 and js(pg, "MP.store.profiles.count()") == 2)
@@ -196,6 +191,7 @@ def main():
         js(pg, "MP.app.go('profiles')"); pg.wait_for_timeout(200)
         pg.locator('.profiles input[type=file]').set_input_files('/tmp/bad.json'); pg.wait_for_timeout(400)
         check('a wrong file is rejected with a message', js(pg, "MP.store.profiles.count()") == 3 and 'not a Mathipelago backup' in pg.locator('.profiles [role=status]').inner_text())
+        js(pg, "document.querySelectorAll('.profiles details.fold').forEach(d=>d.open=true)")
         pg.get_by_role('button', name='Delete this player').click(); pg.wait_for_timeout(200)
         pg.get_by_role('button', name='Cancel').click(); pg.wait_for_timeout(200)
         check('deleting can be cancelled', js(pg, "MP.store.profiles.count()") == 3)
@@ -239,13 +235,11 @@ def main():
                 js(pg, SEED_FREE)
                 js(pg, "l=>MP.store.update(s=>{s.lang=l; s.history.push({id:'m1-1',stars:2,wrong:1,hints:0,day:20261019}); s.buddy=s.collection[0]; s.topics['number-sense']={ok:5,bad:2,hints:1,adj:0,clean:0,review:true}}); MP.app.applySettings()", lang)
                 for n, prm in (('menu', {}), ('map', {}), ('pals', {}), ('dashboard', {}), ('premium', {'id': 'crystal-caves'}), ('parents', {}), ('collection', {}), ('profiles', {})):
-                    js(pg, "([n,p])=>MP.app.go(n,p)", [n, prm]); pg.wait_for_timeout(150)
+                    js(pg, "([n,p])=>MP.app.go(n,p)", [n, prm]); pg.wait_for_timeout(1000)
                     if not js(pg, 'document.documentElement.scrollWidth <= window.innerWidth + 1'): overflow.append((w, lang, n))
                     if w in (360, 320) and lang == 'en':
                         sm = js(pg, """()=>[...document.querySelectorAll('#app button, #app a.btn')].filter(e=>e.offsetParent!==null).map(e=>{const r=e.getBoundingClientRect();return [e.className+'|'+(e.textContent||'').trim().slice(0,12),Math.round(r.width),Math.round(r.height)]}).filter(x=>Math.min(x[1],x[2])<44)""")
                         small += [(n, x) for x in sm]
-                pill_fit = js(pg, "(()=>{MP.app.go('menu'); const b=document.querySelector('.btn.pill'); return b.scrollWidth<=b.clientWidth+1})()")
-                if not pill_fit: overflow.append((w, lang, 'pill-text'))
                 ctx.close()
         check('no horizontal overflow on new screens at 4 sizes x 2 languages', not overflow, overflow[:6])
         check('all tap targets on new screens are at least 44px', not small, small[:8])
