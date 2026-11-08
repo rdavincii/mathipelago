@@ -136,3 +136,6 @@ Also: oval **EN | BM** switch, **Pal Park** (pet, treat, play with, and take a p
 - Settings gear at top right of the menu (replaces the language pill; language is in Settings).
 - "Your player" and "Add player" sections collapse.
 - Map animations pause when off-screen: about 360 running animations down to about 25, 11 to 23 fps at 6x CPU slowdown.
+
+## v0.8.0
+- Duolingo-style visual theme (CSS only, appended block at the end of css/style.css; delete it to get the old look).

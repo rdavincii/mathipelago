@@ -50,12 +50,12 @@ def main():
         check('version: returning player sees a "new" note on the menu', pg.locator('.newbadge').count() == 1)
         js(pg, "MP.app.go('settings')"); pg.wait_for_timeout(300)
         txt = pg.locator('.about').inner_text()
-        check('version: settings shows the version number and what is new', '0.6.0' in txt and "What" in txt and 'Online friends' in txt, txt[:120])
+        check('version: settings shows the version number and what is new', '0.8.0' in txt and 'what' in txt.lower() and 'fresh look' in txt, txt[:120])
         check('version: earlier updates are in a collapsible list', pg.locator('.about details.older').count() == 1)
         js(pg, "MP.app.go('menu')"); pg.wait_for_timeout(300)
         check('version: the note disappears once settings was opened', pg.locator('.newbadge').count() == 0)
         js(pg, "MP.store.update(s=>{s.lang='ms'}); MP.app.applySettings(); MP.app.go('settings')"); pg.wait_for_timeout(300)
-        check('version: update info is translated to Bahasa Melayu', 'Kawan dalam talian' in pg.locator('.about').inner_text())
+        check('version: update info is translated to Bahasa Melayu', 'rupa baharu' in pg.locator('.about').inner_text().lower())
         ctx.close()
 
         # ---------- daily gift ----------
@@ -102,7 +102,7 @@ def main():
         check('finds: finishing the 3rd level finds the Party hat', js(pg, "MP.store.get().closet.join()") == 'party', js(pg, "MP.store.get().closet.join()"))
         check('finds: the completion card announces it', 'New find' in pg.locator('.complete-card').inner_text() and 'Party hat' in pg.locator('.complete-card').inner_text())
         js(pg, "MP.app.go('collection')"); pg.wait_for_timeout(250)
-        check('finds: Nimbo hats show what is needed, and a locked one explains kindly', 'Finish 5 levels' in pg.locator('.hats').inner_text())
+        check('finds: Nimbo hats show what is needed, and a locked one explains kindly', 'finish 5 levels' in pg.locator('.hats').inner_text().lower())
         pg.locator('.hat.locked').first.click(); pg.wait_for_timeout(250)
         check('finds: tapping a locked hat shows "keep playing"', pg.locator('.dialog-card').count() == 1 and 'Keep playing' in pg.locator('.dialog-card').inner_text())
         pg.get_by_role('button', name='OK').click(); pg.wait_for_timeout(200)

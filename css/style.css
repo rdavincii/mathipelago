@@ -469,3 +469,77 @@ html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-mo
 .lanes.go .track .fill { width: var(--to); }
 .lanes.go .track .racer { left: calc(var(--to) - 38px); }
 .lane.you .track { border-color: #1f6fd0; }
+
+/* =====================================================================
+   v0.8.0 "Lesson" theme: flat colours, chunky 3-D buttons, grey-outlined cards, round path nodes.
+   Pure CSS override (class names unchanged). Remove this block to get the old look back.
+   ===================================================================== */
+:root {
+  --ink: #3c3c3c; --ink2: #6b6b6b; --paper: #fff; --paper2: #f7f7f7;
+  --green: #58cc02; --greenD: #46a302; --blue: #1cb0f6; --blueD: #1899d6; --red: #ff4b4b; --redD: #d93a3a;
+  --orange: #ff9600; --gold: #ffc800; --goldD: #e5a800; --line: #e5e5e5; --lineD: #cfcfcf;
+  --sun: #ffc800; --sunD: #e5a800; --mint: #58cc02; --sky: #1cb0f6; --grape: #ce82ff;
+  --good: #3f8f00; --warn: #c25e00; --radius: 16px;
+  --font: "Nunito", "DIN Next Rounded", ui-rounded, "Arial Rounded MT Bold", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --shadow: 0 4px 0 var(--lineD);
+}
+body { background: #fff; color: var(--ink); }
+:focus-visible { outline: 3px solid var(--blue); }
+h1, h2, h3 { font-weight: 800; }
+.hud { background: rgba(255,255,255,.96); border-bottom: 2px solid var(--line); padding: 8px 12px; margin: 0 -16px 8px; padding-left: 16px; padding-right: 16px; backdrop-filter: none; }
+.mapscreen .hud { margin: 0; }
+.hud-title { font-weight: 800; color: var(--ink); }
+
+/* buttons */
+.btn { background: #fff; color: var(--blueD); border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 16px; box-shadow: none;
+  text-transform: uppercase; letter-spacing: .06em; font-weight: 800; font-size: .92rem; transition: transform .06s, border-bottom-width .06s, background .15s; }
+.btn:active:not(:disabled) { transform: translateY(2px); box-shadow: none; border-bottom-width: 2px; }
+.btn:hover:not(:disabled) { background: #f7f7f7; }
+.btn:disabled { opacity: 1; background: var(--line); color: #afafaf; border-color: var(--line); box-shadow: none; }
+.btn.primary { background: var(--greenD); color: #fff; border-color: var(--greenD); border-bottom-color: #377d00; }
+.btn.primary:hover:not(:disabled) { background: #4fb002; }
+.btn.big { font-size: 1.05rem; min-height: 54px; }
+.btn.ghost { background: #fff; color: var(--ink2); }
+.btn.danger { background: #fff; color: var(--red); border-color: var(--line); box-shadow: none; }
+.btn.on, .btn[aria-pressed="true"].lang, .btn[aria-pressed="true"].segbtn, .btn[aria-pressed="true"].rank { background: #ddf4ff; color: var(--blueD); border-color: var(--blue); border-bottom-color: var(--blueD); }
+.btn.round, .btn.pill { text-transform: none; }
+.gearbtn { color: var(--ink2); }
+.coins { border: 2px solid var(--line); background: #fff; color: var(--goldD); font-weight: 800; }
+.newbadge { background: var(--red); color: #fff; border-radius: 999px; }
+
+/* cards and panels */
+.panel, .speech, .promptcard, .race, .fcard, .pcard, .skill, .storycard, .nextcard, .dialog-card, .daytile, .gift, .statcard, .setrow, .psec, .helpbox, .hintbox, .islandname {
+  background: #fff; border: 2px solid var(--line); border-radius: 16px; box-shadow: none; }
+.panel { border-radius: 20px; }
+.hintbox { background: #fff9d6; border-color: #ffe27a; } .helpbox { background: #e6f9d4; border-color: #b8ec8b; }
+.howto { background: #ddf4ff; border: 2px solid #b6e4fb; color: var(--ink); }
+.adaptnote { background: #f1e3ff; color: #7a3fb0; }
+.menu-bg { opacity: .35; } .scenewrap { border: 2px solid var(--line); box-shadow: none; }
+.version { background: var(--line); color: var(--ink2); }
+.testbanner { background: #fff4cc; color: #7a5a00; border: 2px solid #ffe27a; }
+
+/* progress bar look for any bar in the game */
+.pbar, .wbar, .bfill { border-radius: 999px; }
+.pbar { background: var(--line); border: 0; } .pbar > *, .bfill { background: var(--green); }
+
+/* path map nodes */
+.node { width: 64px; height: 64px; min-height: 64px; border: 0; border-bottom: 6px solid var(--lineD); background: #e5e5e5; color: #afafaf; box-shadow: none; text-transform: none; font-weight: 800; }
+.node:active:not(:disabled) { transform: translateY(4px); border-bottom-width: 2px; }
+.node.done { background: var(--gold); color: #fff; border-bottom-color: var(--goldD); }
+.node.current { background: var(--green); color: #fff; border-bottom-color: var(--greenD); animation: pulse 1.6s ease-in-out infinite; }
+.node.locked { background: #e5e5e5; color: #afafaf; border-bottom-color: var(--lineD); }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(88,204,2,.5); } 50% { box-shadow: 0 0 0 12px rgba(88,204,2,0); } }
+.ncap { background: #fff; border: 2px solid var(--line); color: var(--ink2); }
+.mappath .seg.under { stroke: var(--line); stroke-width: 10; } .mappath .seg.top { stroke: #fff; }
+.mappath .seg.top.done { stroke: var(--gold); } .mappath .seg.top.next { stroke: var(--green); }
+.islandname { border-color: var(--line); color: var(--ink); } .map { border-top: 2px solid var(--line); }
+
+/* race lanes */
+.race { border-color: var(--line); } .lane.lead .rank { color: var(--orange); } .lane.you .lanehead b { color: var(--blueD); }
+.track { background: var(--paper2); border: 2px solid var(--line); } .track .fill { background: var(--green); } .lane.you .track { border-color: var(--blue); }
+
+/* level answers: chunky grey option tiles that turn blue on select */
+.tile, .cell, .shapebtn, .optrow .btn { border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 16px; box-shadow: none; background: #fff; }
+.toast { background: #3c3c3c; border-radius: 14px; }
+.feedback[data-kind="good"] { color: var(--good); } .feedback[data-kind="nudge"] { color: var(--warn); }
+.btn.node, .node { border-radius: 50%; }

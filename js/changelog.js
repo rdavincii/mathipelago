@@ -6,6 +6,9 @@
   'use strict';
   var MP = (window.MP = window.MP || {});
   MP.changelog = [
+    { v: '0.8.0', date: '2026-11-08', items: [
+      { en: 'A fresh look: bright flat colours, chunky buttons, and a gold-and-green path of round level buttons.', ms: 'Rupa baharu: warna rata yang cerah, butang tebal, dan laluan butang tahap bulat berwarna emas dan hijau.' }
+    ] },
     { v: '0.7.0', date: '2026-11-04', items: [
       { en: 'Friends race: see you and your friends racing along a track, ranked by stars.', ms: 'Perlumbaan kawan: lihat anda dan kawan berlumba di landasan, disusun mengikut bintang.' },
       { en: 'Settings is now a gear at the top right. Your player and Add player can fold away.', ms: 'Tetapan kini ikon gear di penjuru kanan atas. Pemain anda dan Tambah pemain boleh dilipat.' },
