@@ -21,6 +21,9 @@
       sound: true,
       music: true,           // background music on/off
       musicVol: 60,          // 0..100
+      theme: null,           // null = follow the device; 'light' | 'dark'
+      haptics: true,         // short phone vibrations on answers and rewards (Android phones)
+      chests: {},            // islandId -> true once its treasure chest was opened
       motion: null,          // null = follow the device's "reduce motion" setting; 'reduce' | 'full'
       textScale: 1,          // 1 | 1.15 | 1.3
       band: 1,               // 0 Explorer, 1 Adventurer, 2 Master Explorer (starting difficulty)
@@ -65,6 +68,9 @@
     if (typeof raw.sound === 'boolean') d.sound = raw.sound;
     if (typeof raw.music === 'boolean') d.music = raw.music;
     d.musicVol = int(raw.musicVol, 0, 100, 60);
+    if (raw.theme === 'light' || raw.theme === 'dark') d.theme = raw.theme;
+    if (typeof raw.haptics === 'boolean') d.haptics = raw.haptics;
+    if (raw.chests && typeof raw.chests === 'object' && !Array.isArray(raw.chests)) Object.keys(raw.chests).slice(0, 200).forEach(function (k) { if (/^[a-z0-9-]{1,40}$/.test(k) && raw.chests[k] === true) d.chests[k] = true; });
     if (raw.motion === 'reduce' || raw.motion === 'full') d.motion = raw.motion;
     if (raw.textScale === 1 || raw.textScale === 1.15 || raw.textScale === 1.3) d.textScale = raw.textScale;
     d.band = int(raw.band, 0, 2, 1);
@@ -262,7 +268,7 @@
 
     /** Wipes progress but keeps language/sound/accessibility choices and who the player is. */
     resetProgress: function () {
-      var keep = { lang: state.lang, sound: state.sound, music: state.music, musicVol: state.musicVol, motion: state.motion, textScale: state.textScale, name: state.name, avatar: state.avatar, seenVersion: state.seenVersion };
+      var keep = { lang: state.lang, sound: state.sound, music: state.music, musicVol: state.musicVol, motion: state.motion, theme: state.theme, haptics: state.haptics, textScale: state.textScale, name: state.name, avatar: state.avatar, seenVersion: state.seenVersion };
       state = defaults();
       for (var k in keep) state[k] = keep[k];
       state.introDone = true;      // don't replay the first-run flow after a reset
@@ -287,7 +293,7 @@
         if (index.list.length >= MAX_PROFILES) return null;
         store.save();
         var id = newId(), d = from ? sanitize(from) : defaults();
-        if (!from) { d.lang = state.lang; d.sound = state.sound; d.music = state.music; d.musicVol = state.musicVol; d.motion = state.motion; d.textScale = state.textScale; d.introDone = true; }
+        if (!from) { d.lang = state.lang; d.sound = state.sound; d.music = state.music; d.musicVol = state.musicVol; d.motion = state.motion; d.theme = state.theme; d.haptics = state.haptics; d.textScale = state.textScale; d.introDone = true; }
         d.name = cleanName(name) || d.name;
         d.avatar = (typeof avatar === 'string' && ID_RE.test(avatar)) ? avatar : (d.avatar || 'nimbo');
         index.list.push({ id: id, name: d.name, avatar: d.avatar });

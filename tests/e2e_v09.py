@@ -1,0 +1,33 @@
+"""v0.9.0: chest, vibration and dark mode. Needs a static server on :8123 (python3 -m http.server 8123)."""
+import json
+from playwright.sync_api import sync_playwright
+res = []
+def check(n, ok, d=''):
+    res.append(bool(ok)); print(('PASS ' if ok else 'FAIL ') + n, '' if ok else d)
+with sync_playwright() as p:
+    b = p.chromium.launch(); pg = b.new_context(viewport={'width': 390, 'height': 844}).new_page()
+    pg.add_init_script("window.__v=[]; navigator.vibrate=function(p){window.__v.push(p);return true}")
+    pg.goto('http://localhost:8123/index.html'); pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(400)
+    pg.evaluate("MP.store.update(s=>{s.introDone=true;s.tutorialDone=true;s.lang='en';MP.levels.byIsland('meadow').forEach(l=>{s.levels[l.id]={done:true,stars:3,plays:1,hints:0,wrong:0}})}); MP.app.go('map')"); pg.wait_for_timeout(600)
+    check('chest: ready after the island is finished', pg.locator('.chestbtn.ready').count() == 1)
+    pg.locator('.chestbtn:not(.ready):not(.done)').first.dispatch_event('click'); pg.wait_for_timeout(200)
+    check('chest: a locked one explains itself and gives nothing', pg.evaluate("MP.store.get().coins") == 0 and pg.locator('.toast.show').count() == 1)
+    pg.evaluate("window.__v.length=0"); pg.locator('.chestbtn.ready').dispatch_event('click'); pg.wait_for_timeout(300)
+    pg.get_by_role('button', name='Open!').dispatch_event('click'); pg.wait_for_timeout(300)
+    check('chest: opening pays 10 + the island stars, once', pg.evaluate("MP.store.get().coins") == 22 and pg.evaluate("MP.store.get().chests.meadow") is True)
+    check('chest: the HUD coin count updates', pg.locator('.hud .coins b').inner_text() == '22')
+    check('haptics: the chest vibrates once', pg.evaluate("window.__v.length") == 1)
+    pg.evaluate("MP.ui.closeDialog(); MP.app.go('map')"); pg.wait_for_timeout(400)
+    check('chest: it stays opened after leaving', pg.locator('.chestbtn.done').count() == 1 and pg.locator('.chestbtn.ready').count() == 0)
+    pg.evaluate("MP.store.update(s=>{s.haptics=false}); MP.app.applySettings(); window.__v.length=0; MP.audio.play('ok')")
+    check('haptics: off means no vibration', pg.evaluate("window.__v.length") == 0)
+    pg.evaluate("MP.store.update(s=>{s.haptics=true}); MP.app.applySettings(); MP.audio.play('tap'); MP.audio.play('ok')")
+    check('haptics: answers vibrate but plain taps do not', pg.evaluate("window.__v.length") == 1)
+    pg.evaluate("MP.store.update(s=>{s.theme='dark'}); MP.app.applySettings()")
+    check('dark: the dark theme is applied', pg.evaluate("document.documentElement.dataset.theme") == 'dark' and pg.evaluate("getComputedStyle(document.body).backgroundColor") == 'rgb(19, 31, 36)')
+    pg.evaluate("MP.store.update(s=>{s.theme='light'}); MP.app.applySettings()")
+    check('dark: light stays light', pg.evaluate("document.documentElement.dataset.theme") == 'light')
+    saved = json.loads(pg.evaluate("JSON.stringify(MP.store.exportActive ? MP.store.exportActive() : MP.store.get())"))
+    check('chest: opened chests are saved', 'meadow' in json.dumps(saved))
+    b.close()
+print(json.dumps({'passed': sum(res), 'failed': len(res) - sum(res)}))

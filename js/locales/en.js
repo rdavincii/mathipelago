@@ -318,6 +318,22 @@
     "fr.racePlace": "You are #{a} of {b}",
     "fr.you": "You",
     "fr.raceNote": "Stars decide the order. The track shows levels finished.",
+    "chest.title": "Treasure chest",
+    "chest.locked": "Finish every level on this island to open it.",
+    "chest.open": "Ready to open",
+    "chest.opened": "Already opened",
+    "chest.openBtn": "Open!",
+    "chest.found": "You found {n} coins!",
+    "chest.close": "Close",
+    "map.start": "Start",
+    "map.unit": "Island {n}",
+    "set.theme": "Look",
+    "set.themeAuto": "Auto",
+    "set.themeLight": "Light",
+    "set.themeDark": "Dark",
+    "set.haptics": "Vibration (Android phones)",
+    "set.hapticsOn": "On",
+    "set.hapticsOff": "Off",
     "map.levelN": "Level {n}:"
   });
 })();

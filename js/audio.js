@@ -143,8 +143,16 @@
       [523, 659, 784, 1047, 784, 1047, 1319].forEach(function (f, i) { tone(f, i * 0.1, 0.22, 'triangle', 0.14); });
     },
     unlock: function () { tone(392, 0, 0.1, 'sine', 0.12); tone(587, 0.1, 0.1, 'sine', 0.12); tone(880, 0.2, 0.25, 'sine', 0.12); },
+    chest: function () { [523, 659, 784, 1047, 1319].forEach(function (f, k) { tone(f, k * 0.07, 0.16, 'sine', 0.1); }); },
     whoosh: function () { tone(200, 0, 0.25, 'sawtooth', 0.03); tone(400, 0.05, 0.2, 'sawtooth', 0.02); }
   };
+
+  var hapticsOn = true;
+  var BUZZ = { ok: [18], nope: [14, 50, 14], win: [20, 40, 20, 40, 70], unlock: [16], coin: [10], chest: [30, 40, 20, 40, 20, 40, 80] };
+  function buzz(name) {
+    var pat = BUZZ[name];
+    if (pat && hapticsOn && typeof navigator !== 'undefined' && navigator.vibrate && !document.hidden) { try { navigator.vibrate(pat); } catch (e) { /* ignore */ } }
+  }
 
   MP.audio = {
     setEnabled: function (on) { enabled = !!on; },
@@ -160,7 +168,10 @@
     /** Call from a user gesture (first tap) so mobile browsers allow sound. */
     unlock: function () { var c = ensureCtx(); if (c) { silentBlip(); unlocked = true; } if (musicOn && !timer) startMusic(); },
     state: function () { return ctx ? ctx.state : 'none'; },
-    play: function (name) { var f = SOUNDS[name]; if (f && enabled) f(); }
+    play: function (name) { buzz(name); var f = SOUNDS[name]; if (f && enabled) f(); },
+    /** Phone vibration (Android browsers; iPhones ignore it). Only for answers and rewards, never for plain taps. */
+    setHaptics: function (on) { hapticsOn = !!on; },
+    buzz: buzz
   };
 
   // Any tap, key press or touch anywhere re-wakes a sleeping audio engine (the usual cause of "sound sometimes stops").

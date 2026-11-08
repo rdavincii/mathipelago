@@ -318,6 +318,22 @@
     "fr.racePlace": "Anda di tempat #{a} daripada {b}",
     "fr.you": "Anda",
     "fr.raceNote": "Bintang menentukan kedudukan. Landasan menunjukkan tahap yang telah tamat.",
+    "chest.title": "Peti harta karun",
+    "chest.locked": "Tamatkan semua tahap di pulau ini untuk membukanya.",
+    "chest.open": "Sedia dibuka",
+    "chest.opened": "Sudah dibuka",
+    "chest.openBtn": "Buka!",
+    "chest.found": "Anda jumpa {n} syiling!",
+    "chest.close": "Tutup",
+    "map.start": "Mula",
+    "map.unit": "Pulau {n}",
+    "set.theme": "Rupa",
+    "set.themeAuto": "Auto",
+    "set.themeLight": "Cerah",
+    "set.themeDark": "Gelap",
+    "set.haptics": "Getaran (telefon Android)",
+    "set.hapticsOn": "Hidup",
+    "set.hapticsOff": "Mati",
     "map.levelN": "Tahap {n}:"
   });
 })();

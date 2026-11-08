@@ -6,6 +6,12 @@
   'use strict';
   var MP = (window.MP = window.MP || {});
   MP.changelog = [
+    { v: '0.9.0', date: '2026-11-09', items: [
+      { en: 'A new path map: round level buttons wind down the screen, with a coloured banner for each island.', ms: 'Peta laluan baharu: butang tahap bulat meliuk ke bawah skrin, dengan sepanduk berwarna untuk setiap pulau.' },
+      { en: 'Treasure chests: finish every level on an island, then open its chest for coins.', ms: 'Peti harta karun: tamatkan semua tahap di sebuah pulau, kemudian buka petinya untuk syiling.' },
+      { en: 'Dark mode in Settings (or follow your phone).', ms: 'Mod gelap dalam Tetapan (atau ikut telefon anda).' },
+      { en: 'Short vibrations for right and wrong answers and rewards on Android phones. You can turn them off.', ms: 'Getaran ringkas untuk jawapan betul dan salah serta ganjaran pada telefon Android. Anda boleh mematikannya.' }
+    ] },
     { v: '0.8.0', date: '2026-11-08', items: [
       { en: 'A fresh look: bright flat colours, chunky buttons, and a gold-and-green path of round level buttons.', ms: 'Rupa baharu: warna rata yang cerah, butang tebal, dan laluan butang tahap bulat berwarna emas dan hijau.' }
     ] },

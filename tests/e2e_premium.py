@@ -64,10 +64,8 @@ def main():
         # map nodes: premium locked until the free island chain is done
         js(pg, "MP.app.go('map')"); pg.wait_for_timeout(300)
         check('map shows 312 level nodes', pg.locator('.node').count() == 312)
-        order = js(pg, """()=>{const ns=[...document.querySelectorAll('.node')].map(e=>{const r=e.getBoundingClientRect(); return {n:+e.dataset.order, x:r.left+r.width/2, y:r.top+scrollY+r.height/2}});
-          const byY=[...ns].sort((a,b)=>b.y-a.y), rows=[]; byY.forEach(o=>{const last=rows[rows.length-1]; if(last && last[0].y-o.y<40) last.push(o); else rows.push([o]);});
-          const seq=rows.flatMap(r=>r.sort((a,b)=>a.x-b.x)).map(o=>o.n); return {ok: seq.every((v,i)=>v===i+1), rows: rows.length, bad: seq.filter((v,i)=>v!==i+1).slice(0,8), dom: ns.map(o=>o.n).every((v,i)=>v===i+1)}}""")
-        check('levels read 1, 2, 3 ... 312 in order: left to right, rows bottom to top', order['ok'] and order['dom'], order)
+        order = js(pg, """()=>{const ns=[...document.querySelectorAll('.node')].map(e=>{const r=e.getBoundingClientRect(); return {n:+e.dataset.order, y:r.top+scrollY}}); const seq=[...ns].sort((a,b)=>a.y-b.y).map(o=>o.n); return {ok: seq.every((v,i)=>v===i+1), dom: ns.map(o=>o.n).every((v,i)=>v===i+1)}}""")
+        check('levels read 1, 2, 3 ... 312 in order, top to bottom', order['ok'] and order['dom'], order)
         check('first premium level is locked before the free levels are done', js(pg, "document.querySelectorAll('.node')[12].classList.contains('locked')"))
         js(pg, SEED_FREE); js(pg, "MP.app.go('map')"); pg.wait_for_timeout(300)
         check('first premium level opens after the 12 free levels', not js(pg, "document.querySelectorAll('.node')[12].classList.contains('locked')") and js(pg, "document.querySelectorAll('.node')[13].classList.contains('locked')"))
@@ -153,9 +151,9 @@ def main():
         pg.wait_for_timeout(1200)
         check('front page: clouds drift and the mascot keeps flying', a != js(pg, "[...document.querySelectorAll('.menu-bg .drift')].map(e=>getComputedStyle(e).transform).join()") and m1 != js(pg, "getComputedStyle(document.querySelector('.nimbo-wrap svg')).transform"))
         js(pg, "MP.app.go('map')"); pg.wait_for_timeout(400)
-        c1 = js(pg, "[...document.querySelectorAll('.skycloud')].map(e=>Math.round(e.getBoundingClientRect().left)).join()"); m2 = js(pg, "getComputedStyle(document.querySelector('.map-nimbo')).transform")
+        m2 = js(pg, "getComputedStyle(document.querySelector('.map-nimbo')).transform")
         pg.wait_for_timeout(1200)
-        check('map: sky clouds drift and the mascot keeps flying', c1 != js(pg, "[...document.querySelectorAll('.skycloud')].map(e=>Math.round(e.getBoundingClientRect().left)).join()") and m2 != js(pg, "getComputedStyle(document.querySelector('.map-nimbo')).transform"))
+        check('map: the mascot keeps flying', m2 != js(pg, "getComputedStyle(document.querySelector('.map-nimbo')).transform"))
         js(pg, "MP.app.go('dashboard')"); pg.wait_for_timeout(300)
         n = js(pg, "document.querySelectorAll('.skill').length")
         check('dashboard lists skills with progress and a rank for each', n >= 20 and pg.locator('.skill .skrank').count() == n and pg.locator('.skillsec .skcount').count() == 1, n)

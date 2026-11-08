@@ -101,7 +101,7 @@ const used = new Set();
 ['js/app.js', 'js/puzzles.js', 'js/ui.js'].forEach(f => {
   const src = fs.readFileSync(path.join(root, f), 'utf8');
   (src.match(/\bt\('([a-zA-Z0-9_.]+)'/g) || []).forEach(m => used.add(m.slice(3, -1)));
-  (src.match(/'((?:fb|puz|lvl|done|adapt|tut|map|nav|menu|intro|lang|set|reset|col|hat|par|premium|demo|err|app|place|pals|dash|test|prof|acc|streak|find|ver|fr)\.[a-zA-Z0-9.]+)'/g) || []).forEach(m => used.add(m.slice(1, -1)));
+  (src.match(/'((?:fb|puz|lvl|done|adapt|tut|map|nav|menu|intro|lang|set|reset|col|hat|par|premium|demo|err|app|place|pals|dash|test|prof|acc|streak|find|ver|fr|chest)\.[a-zA-Z0-9.]+)'/g) || []).forEach(m => used.add(m.slice(1, -1)));
 });
 const dynamic = ['pals.bond.0', 'pals.bond.1', 'pals.bond.2', 'pals.bond.3', 'pals.bond.4', 'pals.bond.5', 'pals.hello.0', 'pals.hello.1', 'pals.hello.2', 'pals.hello.3', 'pals.hello.4', 'pals.hello.5',
   'pals.pet.1', 'pals.pet.2', 'pals.pet.3', 'pals.feed.1', 'pals.feed.2', 'pals.play.1', 'pals.play.2', 'dash.rank.0', 'dash.rank.1', 'dash.rank.2', 'dash.rank.3', 'dash.skill.new', 'dash.skill.learning', 'dash.skill.growing', 'dash.skill.strong', 'band.explorer', 'band.adventurer', 'band.master', 'band.explorer.ages', 'band.adventurer.ages', 'band.master.ages', 'hat.sprout', 'hat.stargoggles', 'hat.captain', 'hat.rainbow', 'acc.party', 'acc.bow', 'acc.flower', 'acc.glasses', 'acc.bandana', 'acc.goggles', 'acc.hat', 'acc.scarf', 'acc.tophat', 'acc.headphones', 'acc.leafcrown', 'acc.halo', 'acc.wizard', 'acc.crown']

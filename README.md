@@ -139,3 +139,8 @@ Also: oval **EN | BM** switch, **Pal Park** (pet, treat, play with, and take a p
 
 ## v0.8.0
 - Duolingo-style visual theme (CSS only, appended block at the end of css/style.css; delete it to get the old look).
+
+## v0.9.0
+- Duolingo-style vertical path map, one coloured banner per island, tap-to-open treasure chest at each island's end (10 coins + the island's stars, once).
+- Dark mode (Settings > Look: Auto/Light/Dark).
+- Vibration feedback via navigator.vibrate (Android browsers only; iPhones ignore it). Fires for correct, wrong, win, unlock, coin and chest sounds, never for plain taps. Setting: Vibration.

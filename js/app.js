@@ -89,12 +89,17 @@
   function doneCount() { return MP.levels.all().filter(function (l) { return isDone(l.id); }).length; }
   function equippedHat() { var w = S.get().wardrobe; return w.equipped || null; }
 
+  var themeWatch = null;
   function applySettings() {
     var sv = S.get();
     MP.i18n.setLang(sv.lang || MP.i18n.detect());
     MP.audio.setEnabled(sv.sound);
     MP.audio.setMusic(sv.music, sv.musicVol);
     var d = document.documentElement;
+    MP.audio.setHaptics(sv.haptics !== false);
+    var dark = sv.theme === 'dark' || (sv.theme !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    d.setAttribute('data-theme', dark ? 'dark' : 'light');
+    if (!themeWatch && window.matchMedia) { themeWatch = window.matchMedia('(prefers-color-scheme: dark)'); if (themeWatch.addEventListener) themeWatch.addEventListener('change', function () { if (!S.get().theme) applySettings(); }); }
     d.setAttribute('data-motion', sv.motion || 'auto');
     d.style.setProperty('--ts', String(sv.textScale));
     document.title = MP.config.gameName + ' — ' + t('app.tagline');
@@ -445,108 +450,79 @@
     for (i = 0; i < extra; i++) rows[mid[i]]++;
     return rows;
   }
-  function islandBlockH(n) { return n <= 4 ? 250 : 112 + Math.ceil(n / 3) * 120 - 20; }
-  function nodePositions(blockY, h, n) {
-    var rows = rowsFor(n), out = [], k = 0;
-    rows.forEach(function (cnt, r) {
-      var rowY = rows.length === 1 ? h - 92 : h - 82 - r * 120;
-      for (var j = 0; j < cnt; j++, k++) out.push({ x: 30 + 340 * (j + .5) / cnt, y: blockY + rowY + (j % 2 ? -10 : 0) });
+  /* ---------------- map: a vertical path of round level buttons, one coloured banner per island, a treasure chest at the end ---------------- */
+  var UNIT_COLORS = [['#58cc02', '#46a302'], ['#1cb0f6', '#1899d6'], ['#ce82ff', '#a35fd6'], ['#ff9600', '#d97d00'], ['#ff86d0', '#d964ab'], ['#2bc4b4', '#1f9c8f'], ['#ff6b6b', '#d94f4f'], ['#8c7bff', '#6d5ce0']];
+  var WIGGLE = [0, 38, 62, 38, 0, -38, -62, -38];
+  function chestSvg() {
+    return '<svg viewBox="0 0 80 72" aria-hidden="true" focusable="false"><ellipse cx="40" cy="67" rx="30" ry="4" fill="rgba(0,0,0,.18)"/>' +
+      '<rect x="10" y="30" width="60" height="34" rx="6" fill="#1cb0f6" stroke="#1899d6" stroke-width="3"/><rect x="10" y="30" width="60" height="9" fill="#1899d6"/>' +
+      '<rect x="8" y="30" width="9" height="34" rx="3" fill="#ffc800"/><rect x="63" y="30" width="9" height="34" rx="3" fill="#ffc800"/>' +
+      '<g class="chestglow"><ellipse cx="40" cy="32" rx="22" ry="8" fill="#fff3a0"/></g>' +
+      '<g class="chestlid"><path d="M8 30 Q8 8 40 8 Q72 8 72 30 Z" fill="#ffc800" stroke="#e5a800" stroke-width="3"/><rect x="8" y="26" width="64" height="6" fill="#e5a800"/><rect x="34" y="24" width="12" height="14" rx="3" fill="#fff" stroke="#e5a800" stroke-width="2"/></g></svg>';
+  }
+  function islandStars(isl) { var n = 0; MP.levels.byIsland(isl.id).forEach(function (l) { var r = levelRec(l.id); if (r && r.done) n += r.stars; }); return n; }
+  function openChest(isl) {
+    var coins = 10 + islandStars(isl), box = el('div', { class: 'chestbox' }), pic = el('div', { class: 'chestpic shake', svg: chestSvg() }), msg = el('p', { class: 'chestmsg', attrs: { role: 'status', 'aria-live': 'polite' }, text: '' });
+    var open = btn('primary big', t('chest.openBtn'), function () {
+      open.disabled = true; pic.classList.remove('shake'); pic.classList.add('opened');
+      S.update(function (v) { v.coins += coins; v.chests[isl.id] = true; });
+      MP.audio.play('chest'); var hc = document.querySelector('.hud .coins'); if (hc) { hc.querySelector('b').textContent = String(S.get().coins); hc.setAttribute('aria-label', t('hud.coins', { n: S.get().coins })); }
+      msg.textContent = t('chest.found', { n: coins }); msg.classList.add('show');
+      for (var k = 0; k < 8; k++) { var c = el('span', { class: 'chestcoin', attrs: { 'aria-hidden': 'true' } }, [icon(A.coinIcon(), 'tiny')]); c.style.setProperty('--a', (k * 45) + 'deg'); box.appendChild(c); }
+      open.hidden = true; if (current.name === 'map') { var cb = document.querySelector('[data-chest="' + isl.id + '"]'); if (cb) { cb.classList.remove('ready'); cb.classList.add('done'); cb.setAttribute('aria-label', t('chest.title') + ' — ' + t('chest.opened')); } }
     });
-    return out;
+    box.appendChild(pic); box.appendChild(msg); box.appendChild(open);
+    MP.ui.dialog({ title: t('chest.title'), body: box, cls: 'chestdlg', buttons: [{ label: t('chest.close'), cls: 'ghost' }] });
   }
 
   SCREENS.map = function (p, scope) {
     var cur = currentLevel(), sv = S.get(), all = MP.levels.all();
     var shown = MP.packs.allIslands().filter(function (i) { return MP.levels.byIsland(i.id).length; });
     var missing = MP.packs.premium().filter(function (pk) { return !MP.levels.all().some(function (l) { return l.pack === pk.id; }); });
-    var hs = shown.map(function (i) { return islandBlockH(MP.levels.byIsland(i.id).length); });
-    var TOP = missing.length ? 300 : 90, GAP = 70, BOT = 50, H = TOP + BOT + hs.reduce(function (a, b) { return a + b; }, 0) + GAP * Math.max(0, shown.length - 1);
-    var layout = [], yy = H - BOT;
-    shown.forEach(function (isl, i) { yy -= hs[i]; layout.push({ y: yy, h: hs[i], theme: isl.id }); yy -= GAP; });
-
-    var map = el('div', { class: 'map' }); map.style.aspectRatio = '400 / ' + H;
-    map.appendChild(el('div', { class: 'mapart', svg: '<svg viewBox="0 0 400 ' + H + '" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">' + A.worldMap(layout, H) + '</svg>' }));
-
-    var pos = {}, pathSvg = '<svg class="mappath" viewBox="0 0 400 ' + H + '" aria-hidden="true" focusable="false">';
-    shown.forEach(function (isl, i) {
-      var lvs = MP.levels.byIsland(isl.id), pts = nodePositions(layout[i].y, layout[i].h, lvs.length);
-      lvs.forEach(function (lv, j) { pos[lv.id] = pts[j]; });
-    });
-    // A simple trail: each step is one gentle S-curve, drawn as a dashed line with a dark outline so it reads on every island colour.
-    var marched = false;
-    all.forEach(function (lv, i) {
-      if (i === 0 || !pos[lv.id] || !pos[all[i - 1].id]) return;
-      var a = pos[all[i - 1].id], b = pos[lv.id], dx = b.x - a.x, dy = b.y - a.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
-      var k = Math.min(26, len * 0.28) * (i % 2 ? 1 : -1), nx = -dy / len * k, ny = dx / len * k;
-      var d = 'M' + a.x + ' ' + a.y + ' C' + (a.x + dx / 3 + nx).toFixed(1) + ' ' + (a.y + dy / 3 + ny).toFixed(1) + ' ' + (a.x + 2 * dx / 3 - nx).toFixed(1) + ' ' + (a.y + 2 * dy / 3 - ny).toFixed(1) + ' ' + b.x + ' ' + b.y;
-      var done = isDone(all[i - 1].id), next = !done && !marched && isUnlocked(all[i - 1]);
-      if (next) marched = true;
-      pathSvg += '<path class="seg under" d="' + d + '"/><path class="seg top' + (done ? ' done' : '') + (next ? ' next' : '') + '" d="' + d + '"/>';
-    });
-    map.appendChild(el('div', { class: 'mapart', svg: pathSvg + '</svg>' }));
-
-    function place(node, pt) { node.style.left = (pt.x / 4) + '%'; node.style.top = (pt.y / (H / 100)) + '%'; return node; }
+    var map = el('div', { class: 'map dmap' }), focusNode = null, buddy = sv.buddy && critterById(sv.buddy), idx = 0;
 
     shown.forEach(function (isl, i) {
-      var lvs = MP.levels.byIsland(isl.id), done = lvs.filter(function (l) { return isDone(l.id); }).length, locked = !isUnlocked(lvs[0]);
-      map.appendChild(place(el('div', { class: 'islandname' + (locked ? ' locked' : '') }, [
-        el('b', { text: tx(isl.name) }), el('small', { text: t('map.islandProgress', { a: done, b: lvs.length }) })
-      ]), { x: 200, y: layout[i].y + 14 }));
-    });
-
-    if (missing.length) {   // premium packs that are not owned: one fogged teaser at the top instead of ten
-      var fog = el('div', { class: 'fog' }); fog.style.height = (TOP / (H / 100)) + '%'; fog.style.top = (TOP / 2 / (H / 100)) + '%'; fog.style.left = '50%';
-      map.appendChild(fog);
-      var n = missing.reduce(function (a, pk) { return a + pk.levels; }, 0);
-      map.appendChild(place(btn('teaser', el('span', null, [icon(A.lock(), 'lockico sm'), el('b', { text: t('map.moreIslands', { n: n }) }), el('small', { text: t('premium.badge') })]),
-        function () { go('premium', { id: missing[0].id }); }, { 'aria-label': t('map.moreIslands', { n: n }) + ' — ' + t('premium.badge') }), { x: 200, y: TOP / 2 }));
-    }
-
-    var sky = el('div', { class: 'mapsky', attrs: { 'aria-hidden': 'true' } }), nClouds = Math.max(4, Math.round(H / 320)), ci;
-    for (ci = 0; ci < nClouds; ci++) {
-      var cl = el('span', { class: 'skycloud', svg: A.cloudSvg() });
-      cl.style.top = ((ci + 0.5) / nClouds * 100 - 2 + (ci % 3) * 1.5).toFixed(1) + '%';
-      cl.style.width = (80 + (ci * 37) % 70) + 'px';
-      cl.style.setProperty('--dur', (46 + (ci * 13) % 40) + 's'); cl.style.setProperty('--delay', '-' + ((ci * 17) % 60) + 's');
-      sky.appendChild(cl);
-    }
-    map.appendChild(sky);
-
-    var focusNode = null, buddy = sv.buddy && critterById(sv.buddy);
-    all.forEach(function (lv) {
-      if (!pos[lv.id]) return;
-      var rec = levelRec(lv.id), open = isUnlocked(lv), done = !!(rec && rec.done), isCur = cur && cur.id === lv.id;
-      var label = t('map.levelN', { n: lv.order }) + ' ' + tx(lv.title) + ' — ' + (done ? t('map.stars', { n: rec.stars }) : open ? t('map.ready') : t('map.locked'));
-      var inner = [];
-      if (!open) inner.push(icon(A.lock(), 'lockico'));
-      else inner.push(el('b', { class: 'num', text: String(lv.order) }));
-      var stars = el('span', { class: 'nstars', attrs: { 'aria-hidden': 'true' } });
-      if (done) for (var s = 1; s <= 3; s++) stars.appendChild(icon(A.star(s <= rec.stars), 'tiny'));
-      var node = btn('node' + (done ? ' done' : '') + (open ? '' : ' locked') + (isCur ? ' current' : ''),
-        el('span', { class: 'nodeinner' }, inner),
+      var lvs = MP.levels.byIsland(isl.id), done = lvs.filter(function (l) { return isDone(l.id); }).length, col = UNIT_COLORS[i % UNIT_COLORS.length];
+      var sec = el('section', { class: 'unit' }); sec.style.setProperty('--c', col[0]); sec.style.setProperty('--cd', col[1]);
+      sec.appendChild(el('div', { class: 'islandname' + (isUnlocked(lvs[0]) ? '' : ' locked') }, [
+        el('small', { text: t('map.unit', { n: i + 1 }) + ' · ' + t('map.islandProgress', { a: done, b: lvs.length }) }), el('b', { text: tx(isl.name) })]));
+      lvs.forEach(function (lv) {
+        var rec = levelRec(lv.id), open = isUnlocked(lv), isDn = !!(rec && rec.done), isCur = cur && cur.id === lv.id;
+        var label = t('map.levelN', { n: lv.order }) + ' ' + tx(lv.title) + ' — ' + (isDn ? t('map.stars', { n: rec.stars }) : open ? t('map.ready') : t('map.locked'));
+        var inner = [];
+        if (!open) inner.push(icon(A.lock(), 'lockico')); else inner.push(el('b', { class: 'num', text: String(lv.order) }));
+        var node = btn('node' + (isDn ? ' done' : '') + (open ? '' : ' locked') + (isCur ? ' current' : ''), el('span', { class: 'nodeinner' }, inner),
+          function () { if (!open) { MP.audio.play('nope'); toast(t('map.lockedMsg')); return; } go('level', { id: lv.id }); },
+          { 'aria-label': label, 'aria-disabled': open ? null : 'true', 'data-order': String(lv.order) });
+        var stars = el('span', { class: 'nstars', attrs: { 'aria-hidden': 'true' } });
+        if (isDn) for (var s = 1; s <= 3; s++) stars.appendChild(icon(A.star(s <= rec.stars), 'tiny'));
+        var wrap = el('div', { class: 'nodewrap' }, [isCur ? el('span', { class: 'startbubble', text: t('map.start') }) : null, node, el('span', { class: 'ncap', text: tx(lv.title) }), isDn ? stars : null]);
+        wrap.style.transform = 'translateX(' + WIGGLE[idx % WIGGLE.length] + 'px)'; idx++;
+        if (isCur) {
+          focusNode = wrap; wrap.appendChild(icon(A.nimbo({ mood: 'happy', hat: equippedHat(), cls: 'map-nimbo fly' }), 'nimbo-pin'));
+          if (buddy) wrap.appendChild(icon(palSvg(critterById(sv.buddy), { cls: 'map-buddy float' }), 'buddy-pin'));
+        }
+        sec.appendChild(wrap);
+      });
+      var allDone = done === lvs.length, opened = !!sv.chests[isl.id], ready = allDone && !opened;
+      var chest = btn('chestbtn' + (ready ? ' ready' : '') + (opened ? ' done' : ''), el('span', { class: 'chestico', svg: chestSvg() }),
         function () {
-          if (!open) { MP.audio.play('nope'); toast(t('map.lockedMsg')); return; }
-          go('level', { id: lv.id });
-        }, { 'aria-label': label, 'aria-disabled': open ? null : 'true', 'data-order': String(lv.order) });
-      var wrap = el('div', { class: 'nodewrap' }, [node, el('span', { class: 'ncap', text: tx(lv.title) }), done ? stars : null]);
-      map.appendChild(place(wrap, pos[lv.id]));
-      if (isCur) {
-        focusNode = wrap; wrap.appendChild(icon(A.nimbo({ mood: 'happy', hat: equippedHat(), cls: 'map-nimbo fly' }), 'nimbo-pin'));
-        if (buddy) wrap.appendChild(icon(palSvg(critterById(sv.buddy), { cls: 'map-buddy float' }), 'buddy-pin'));
-      }
+          if (opened || sv.chests[isl.id]) { toast(t('chest.opened')); return; }
+          if (!allDone) { MP.audio.play('nope'); toast(t('chest.locked')); return; }
+          openChest(isl);
+        }, { 'data-chest': isl.id, 'aria-label': t('chest.title') + ' — ' + (opened ? t('chest.opened') : ready ? t('chest.open') : t('chest.locked')) });
+      sec.appendChild(chest);
+      map.appendChild(sec);
     });
+
+    if (missing.length) {   // premium packs that are not owned: one teaser at the end instead of many locked islands
+      var n = missing.reduce(function (a, pk) { return a + pk.levels; }, 0);
+      map.appendChild(el('div', { class: 'unit teaserunit' }, [btn('teaser', el('span', null, [icon(A.lock(), 'lockico sm'), el('b', { text: t('map.moreIslands', { n: n }) }), el('small', { text: t('premium.badge') })]),
+        function () { go('premium', { id: missing[0].id }); }, { 'aria-label': t('map.moreIslands', { n: n }) + ' — ' + t('premium.badge') })]));
+    }
 
     var toastEl = el('div', { class: 'toast', attrs: { role: 'status', 'aria-live': 'polite' } });
     function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); scope.timeout(function () { toastEl.classList.remove('show'); }, 2200); }
-
-    // The premium map has hundreds of looping animations. Only the ones on screen keep running, so slow phones stay smooth.
-    scope.timeout(function () {
-      if (!window.IntersectionObserver || !map.getAnimations) return;
-      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { e.target.style.animationPlayState = e.isIntersecting ? '' : 'paused'; }); }, { rootMargin: '120px 0px' });
-      var seen = [];
-      map.getAnimations({ subtree: true }).forEach(function (a) { var tg = a.effect && a.effect.target; if (tg && tg.style && seen.indexOf(tg) === -1) { seen.push(tg); io.observe(tg); } });
-      scope.add(function () { io.disconnect(); });
-    }, 120);
     scope.timeout(function () {
       if (focusNode && focusNode.scrollIntoView) { try { focusNode.scrollIntoView({ block: 'center', behavior: 'auto' }); } catch (e) { /* ignore */ } }
     }, 30);
@@ -1121,6 +1097,10 @@
       seg(t('set.music'), [{ v: true, label: t('set.musicOn') }, { v: false, label: t('set.musicOff') }], sv.music,
         function (v) { S.update(function (s) { s.music = v; }); applySettings(); rerender(); }),
       musicVolumeRow(),
+      seg(t('set.theme'), [{ v: null, label: t('set.themeAuto') }, { v: 'light', label: t('set.themeLight') }, { v: 'dark', label: t('set.themeDark') }], sv.theme,
+        function (v) { S.update(function (s) { s.theme = v; }); applySettings(); rerender(); }),
+      seg(t('set.haptics'), [{ v: true, label: t('set.hapticsOn') }, { v: false, label: t('set.hapticsOff') }], sv.haptics,
+        function (v) { S.update(function (s) { s.haptics = v; }); applySettings(); if (v) MP.audio.buzz('ok'); rerender(); }),
       seg(t('set.motion'), [{ v: null, label: t('set.motionAuto') }, { v: 'reduce', label: t('set.motionReduce') }, { v: 'full', label: t('set.motionFull') }], sv.motion,
         function (v) { S.update(function (s) { s.motion = v; }); applySettings(); rerender(); }),
       seg(t('set.textSize'), [{ v: 1, label: 'A' }, { v: 1.15, label: 'A+' }, { v: 1.3, label: 'A++' }], sv.textScale,
