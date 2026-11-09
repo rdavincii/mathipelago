@@ -41,7 +41,10 @@
       name: '',              // player name (profiles)
       avatar: 'nimbo',       // avatar id: 'nimbo' or a critter-look name
       closet: [],            // pal accessories found or earned (ids)
-      streak: { day: 0, last: null, best: 0, weeks: 0, total: 0 },   // daily login streak
+      streak: { day: 0, last: null, best: 0, weeks: 0, total: 0, run: 0 },
+      freezes: 0,            // streak freezes (cover a missed day), at most 2
+      boostUntil: 0,         // ms timestamp until which level coins are doubled
+      goal: { day: null, n: 0, paid: false },   // today's daily goal progress   // daily login streak
       online: { on: false, id: null, token: null, code: null },   // optional online friends (see js/friends.js)
       seenVersion: ''        // last app version whose "what's new" the player has seen
     };
@@ -68,6 +71,9 @@
     if (typeof raw.sound === 'boolean') d.sound = raw.sound;
     if (typeof raw.music === 'boolean') d.music = raw.music;
     d.musicVol = int(raw.musicVol, 0, 100, 60);
+    d.freezes = int(raw.freezes, 0, 2, 0);
+    d.boostUntil = (typeof raw.boostUntil === 'number' && isFinite(raw.boostUntil) && raw.boostUntil > 0 && raw.boostUntil < 4e12) ? Math.floor(raw.boostUntil) : 0;
+    if (raw.goal && typeof raw.goal === 'object') d.goal = { day: (typeof raw.goal.day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw.goal.day)) ? raw.goal.day : null, n: int(raw.goal.n, 0, 1000, 0), paid: raw.goal.paid === true };
     if (raw.theme === 'light' || raw.theme === 'dark') d.theme = raw.theme;
     if (typeof raw.haptics === 'boolean') d.haptics = raw.haptics;
     if (raw.chests && typeof raw.chests === 'object' && !Array.isArray(raw.chests)) Object.keys(raw.chests).slice(0, 200).forEach(function (k) { if (/^[a-z0-9-]{1,40}$/.test(k) && raw.chests[k] === true) d.chests[k] = true; });
@@ -82,7 +88,9 @@
       var sk = raw.streak;
       d.streak = { day: int(sk.day, 0, 7, 0), last: (typeof sk.last === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(sk.last)) ? sk.last : null,
         best: int(sk.best, 0, 7, 0), weeks: int(sk.weeks, 0, 9999, 0), total: int(sk.total, 0, 99999, 0) };
-      if (!d.streak.last) d.streak.day = 0;
+      d.streak.run = int(sk.run, 0, 100000, 0);
+      if (!d.streak.last) { d.streak.day = 0; d.streak.run = 0; }
+      if (d.streak.run < d.streak.day) d.streak.run = d.streak.day;
     }
     if (raw.online && raw.online.on === true && /^[0-9a-f-]{36}$/.test(raw.online.id) && /^[0-9a-f]{20,80}$/.test(raw.online.token) && /^[A-Z0-9]{6}$/.test(raw.online.code)) d.online = { on: true, id: raw.online.id, token: raw.online.token, code: raw.online.code };
     if (typeof raw.seenVersion === 'string' && /^[0-9a-z.\-]{1,20}$/i.test(raw.seenVersion)) d.seenVersion = raw.seenVersion;

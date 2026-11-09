@@ -130,11 +130,27 @@
     ]);
   }
 
+  var FLAME_SVG = '<svg viewBox="0 0 24 28" aria-hidden="true" focusable="false"><path d="M12 1 C13 7 20 9 20 18 A8 8 0 0 1 4 18 C4 13 7 11 8 7 C9 9 10 9 10.5 8.5 C11.5 6.5 11.5 3.5 12 1 Z" fill="currentColor"/><path d="M12 15 C13 18 16 18.5 15.5 21.5 A3.6 3.6 0 0 1 8.5 21.5 C8.5 19 11 18.5 12 15 Z" fill="#fff" opacity=".85"/></svg>';
+  var BOLT_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13.5 1 L4 14 h6 l-1.5 9 L20 9 h-6.5 z" fill="currentColor"/></svg>';
+  var GOAL_N = 3, GOAL_COINS = 15, BOOST_MS = 5 * 60 * 1000;
+  function streakCount() { var sv = S.get(); return MP.streak.count(sv.streak, MP.streak.dayKey(), sv.freezes); }
+  function flameChip() {
+    var c = streakCount();
+    return btn('flamechip' + (c.safe ? ' lit' : '') + (c.alive ? '' : ' out'), el('span', null, [icon(FLAME_SVG, 'flame'), el('b', { text: String(c.n) })]), function () { go('streak'); }, { 'aria-label': t('streak.flame', { n: c.n }) });
+  }
+  function boostLeft() { return Math.max(0, S.get().boostUntil - Date.now()); }
+  function boostChip() {
+    var m = Math.ceil(boostLeft() / 60000);
+    return el('span', { class: 'boostchip', attrs: { 'aria-label': t('boost.chip', { n: m }) } }, [icon(BOLT_SVG, 'bolt'), el('b', { text: '\u00d72 \u00b7 ' + m + 'm' })]);
+  }
+  function goalNow() { var g = S.get().goal, d = MP.streak.dayKey(); return g.day === d ? g : { day: d, n: 0, paid: false }; }
   function hud(opts) {
     var items = [];
     if (opts.back) items.push(btn('round ghost', icon(BACK_SVG), opts.back.fn, { 'aria-label': opts.back.label }));
     if (opts.title) items.push(el('h1', { class: 'hud-title', text: opts.title, attrs: { 'data-focus': '' } }));
     else items.push(el('span', { class: 'spacer' }));
+    if (opts.flame) items.push(flameChip());
+    if (boostLeft() > 0) items.push(boostChip());
     if (opts.coins !== false) items.push(el('span', { class: 'coins', attrs: { 'aria-label': t('hud.coins', { n: S.get().coins }) } }, [icon(A.coinIcon(), 'sm'), el('b', { text: String(S.get().coins) })]));
     (opts.right || []).forEach(function (r) { items.push(r); });
     return el('header', { class: 'hud' }, items);
@@ -234,13 +250,19 @@
   };
 
   /* ---------------- main menu ---------------- */
+  function goalCard() {
+    var g = goalNow(), n = Math.min(g.n, GOAL_N), met = n >= GOAL_N;
+    var bar = el('div', { class: 'goalbar', attrs: { role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(GOAL_N), 'aria-valuenow': String(n) } }, [el('span', { class: 'goalfill' })]);
+    bar.firstChild.style.width = Math.round(100 * n / GOAL_N) + '%';
+    return el('div', { class: 'goalcard' + (met ? ' met' : '') }, [el('b', { text: t('goal.title') }), bar, el('small', { text: met ? t('goal.met') : t('goal.n', { a: n, b: GOAL_N }) })]);
+  }
 
   /* ---------------- daily gift (login streak) ---------------- */
-    function streakStatus() { return MP.streak.status(S.get().streak, MP.streak.dayKey()); }
+    function streakStatus() { return MP.streak.status(S.get().streak, MP.streak.dayKey(), S.get().freezes); }
   function claimGift(then) {
-    var r = MP.streak.claim(S.get().streak, MP.streak.dayKey());
+    var r = MP.streak.claim(S.get().streak, MP.streak.dayKey(), S.get().freezes);
     if (!r) return;
-    S.update(function (sv) { sv.coins += r.coins; sv.streak = r.st; });
+    S.update(function (sv) { sv.coins += r.coins; sv.streak = r.st; sv.freezes = Math.max(0, sv.freezes - r.used); });
     MP.audio.play(r.perfect ? 'win' : 'coin');
     if (then) then(r);
   }
@@ -262,7 +284,7 @@
       list.appendChild(dayTile(i, state, MP.streak.REWARDS[i - 1]));
     }
     var node = el('main', { class: 'screen scroll streak' }, [
-      hud({ title: t('streak.title'), back: { label: t('nav.back'), fn: function () { go('menu'); } } }),
+      hud({ title: t('streak.title'), flame: true, back: { label: t('nav.back'), fn: function () { go('menu'); } } }),
       el('p', { class: 'lead', text: t('streak.lead') }),
       list,
       el('p', { class: 'note', text: t('streak.bonus', { n: MP.streak.PERFECT_BONUS }) }),
@@ -270,10 +292,12 @@
         claimGift(function (r) {
           rerender();
           if (r.perfect) MP.ui.dialog({ title: t('streak.perfectTitle'), body: t('streak.perfectBody', { n: r.bonus }), buttons: [{ label: t('ok'), cls: 'primary' }] });
+          else if (r.used) MP.ui.dialog({ title: t('streak.got', { n: r.coins }), body: t('streak.saved'), buttons: [{ label: t('ok'), cls: 'primary' }] });
           else if (r.restarted) MP.ui.dialog({ title: t('streak.got', { n: r.coins }), body: t('streak.restarted'), buttons: [{ label: t('ok'), cls: 'primary' }] });
         });
       }) : el('p', { class: 'reward', text: t('streak.claimed') }),
-      el('p', { class: 'note', text: t('streak.stats', { a: sv.streak.best, b: sv.streak.weeks }) })
+      el('p', { class: 'note', text: t('streak.stats', { a: sv.streak.best, b: sv.streak.weeks }) }),
+      el('p', { class: 'note freezenote', text: t('streak.freezes', { n: sv.freezes }) })
     ]);
     return node;
   };
@@ -419,7 +443,8 @@
           if (!started) go('level', { id: 'm1-1' }); else if (next) go('map'); else go('map');
         }),
         showNewBadge() ? btn('newbadge', t('ver.badge', { v: MP.config.version }), function () { go('settings'); }) : null,
-        btn('giftbtn' + (ready ? ' ready' : ''), el('span', null, [icon(A.coinIcon(), 'coinico'), document.createTextNode(' ' + (ready ? t('streak.chipReady') : t('streak.chipDay', { n: stx.current })))]), function () { go('streak'); }),
+        btn('giftbtn' + (ready ? ' ready' : ''), el('span', null, [icon(FLAME_SVG, 'flame' + (streakCount().safe ? ' lit' : '')), document.createTextNode(' ' + (ready ? t('streak.chipReady') : t('streak.flame', { n: streakCount().n })))]), function () { go('streak'); }),
+        goalCard(),
         el('div', { class: 'menu-grid' }, [
           btn('', t('menu.map'), function () { go('map'); }),
           btn('', t('menu.dashboard'), function () { go('dashboard'); }),
@@ -461,13 +486,33 @@
       '<g class="chestlid"><path d="M8 30 Q8 8 40 8 Q72 8 72 30 Z" fill="#ffc800" stroke="#e5a800" stroke-width="3"/><rect x="8" y="26" width="64" height="6" fill="#e5a800"/><rect x="34" y="24" width="12" height="14" rx="3" fill="#fff" stroke="#e5a800" stroke-width="2"/></g></svg>';
   }
   function islandStars(isl) { var n = 0; MP.levels.byIsland(isl.id).forEach(function (l) { var r = levelRec(l.id); if (r && r.done) n += r.stars; }); return n; }
+  var PRIZE_KEY = { coins: 'chest.prize.coins', boost: 'chest.prize.boost', freeze: 'chest.prize.freeze', find: 'chest.prize.find' };
+  function seeded(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619); return (h >>> 0) / 4294967296; }
+  /** Every chest holds coins plus one surprise. The surprise is fixed per island (same chest, same prize), so reloading never rerolls it. */
+  function chestPrize(islandId) {
+    var sv = S.get(), r = seeded('chest:' + islandId), pool = [];
+    HATS.forEach(function (h) { if (sv.wardrobe.owned.indexOf(h.id) === -1) pool.push({ kind: 'hat', id: h.id }); });
+    Object.keys(PAL_AT).forEach(function (id) { if (sv.closet.indexOf(id) === -1) pool.push({ kind: 'acc', id: id }); });
+    if (r < 0.3) return { kind: 'coins', n: 15 };
+    if (r < 0.55) return { kind: 'boost' };
+    if (r < 0.78) return sv.freezes < MP.streak.MAX_FREEZES ? { kind: 'freeze' } : { kind: 'boost' };
+    return pool.length ? { kind: 'find', item: pool[Math.floor(seeded('pick:' + islandId) * pool.length)] } : { kind: 'coins', n: 15 };
+  }
   function chestBox(isl) {
     var coins = 10 + islandStars(isl), box = el('div', { class: 'chestbox' }), pic = el('div', { class: 'chestpic shake', svg: chestSvg() }), msg = el('p', { class: 'chestmsg', attrs: { role: 'status', 'aria-live': 'polite' }, text: '' });
     var open = btn('primary big', t('chest.openBtn'), function () {
       open.disabled = true; pic.classList.remove('shake'); pic.classList.add('opened');
-      S.update(function (v) { v.coins += coins; v.chests[isl.id] = true; });
+      var prize = chestPrize(isl.id), prizeText = '';
+      S.update(function (v) {
+        v.coins += coins; v.chests[isl.id] = true;
+        if (prize.kind === 'coins') v.coins += prize.n;
+        else if (prize.kind === 'boost') v.boostUntil = Math.max(Date.now(), v.boostUntil) + BOOST_MS;
+        else if (prize.kind === 'freeze') v.freezes = Math.min(MP.streak.MAX_FREEZES, v.freezes + 1);
+        else if (prize.kind === 'find') { if (prize.item.kind === 'hat') v.wardrobe.owned.push(prize.item.id); else v.closet.push(prize.item.id); }
+      });
+      prizeText = t(PRIZE_KEY[prize.kind], { n: prize.n, name: prize.item ? t((prize.item.kind === 'hat' ? 'hat.' : 'acc.') + prize.item.id) : '' });
       MP.audio.play('chest'); var hc = document.querySelector('.hud .coins'); if (hc) { hc.querySelector('b').textContent = String(S.get().coins); hc.setAttribute('aria-label', t('hud.coins', { n: S.get().coins })); }
-      msg.textContent = t('chest.found', { n: coins }); msg.classList.add('show');
+      msg.textContent = t('chest.found', { n: coins }) + ' ' + prizeText; msg.classList.add('show');
       for (var k = 0; k < 8; k++) { var c = el('span', { class: 'chestcoin', attrs: { 'aria-hidden': 'true' } }, [icon(A.coinIcon(), 'tiny')]); c.style.setProperty('--a', (k * 45) + 'deg'); box.appendChild(c); }
       open.hidden = true; if (current.name === 'map') { var cb = document.querySelector('[data-chest="' + isl.id + '"]'); if (cb) { cb.classList.remove('ready'); cb.classList.add('done'); cb.setAttribute('aria-label', t('chest.title') + ' — ' + t('chest.opened')); } }
     });
@@ -533,7 +578,7 @@
     }, 30);
 
     return el('main', { class: 'screen mapscreen' }, [
-      hud({ title: t('map.title'), back: { label: t('nav.menu'), fn: function () { go('menu'); } },
+      hud({ title: t('map.title'), flame: true, back: { label: t('nav.menu'), fn: function () { go('menu'); } },
         right: [btn('small ghost', t('menu.pals'), function () { go('pals'); }, { 'aria-label': t('pals.title') })] }),
       testBanner(),
       map, toastEl
@@ -663,7 +708,11 @@
       S.update(function (sv) {
         var rec = sv.levels[lv.id] || (sv.levels[lv.id] = { done: false, stars: 0, plays: 0, lastPuzzle: null, hints: 0, wrong: 0 });
         var kind = AD.record(sv, lv, run), stars = AD.stars(run), wasFirst = !rec.done, old = rec.stars;
-        var coins = wasFirst ? 10 + 5 * stars : 5 * Math.max(0, stars - old);
+        var coins = wasFirst ? 10 + 5 * stars : 5 * Math.max(0, stars - old), boosted = sv.boostUntil > Date.now() && coins > 0, goalHit = false, gd = MP.streak.dayKey();
+        if (boosted) coins *= 2;
+        if (sv.goal.day !== gd) sv.goal = { day: gd, n: 0, paid: false };
+        sv.goal.n += 1;
+        if (!sv.goal.paid && sv.goal.n >= GOAL_N) { sv.goal.paid = true; goalHit = true; coins += GOAL_COINS; }
         rec.done = true; rec.stars = Math.max(old, stars); rec.plays += 1; rec.lastPuzzle = puzzle.id;
         rec.hints += run.hints; rec.wrong += run.wrong;
         sv.coins += coins;
@@ -672,7 +721,7 @@
         if (lv.id === 'm1-1') sv.tutorialDone = true;
         sv.history.push({ id: lv.id, stars: stars, wrong: run.wrong, hints: run.hints, day: dayNum() });
         if (sv.history.length > 40) sv.history = sv.history.slice(-40);
-        result = { kind: kind, stars: stars, coins: coins, first: wasFirst, newCritter: newCritter, finds: [] };
+        result = { kind: kind, stars: stars, coins: coins, boosted: boosted, goalHit: goalHit, first: wasFirst, newCritter: newCritter, finds: [] };
       });
       result.finds = awardFinds();
       MP.audio.play('win');
@@ -686,6 +735,8 @@
       for (var i = 1; i <= 3; i++) stars.appendChild(icon(A.star(i <= r.stars), 'bigstar s' + i));
       body.appendChild(stars);
       body.appendChild(el('p', { class: 'reward', text: r.coins > 0 ? t('done.coins', { n: r.coins }) : t('done.noCoins') }));
+      if (r.boosted) body.appendChild(el('p', { class: 'boostline', text: t('done.boosted') }));
+      if (r.goalHit) body.appendChild(el('p', { class: 'goalline', text: t('goal.done', { n: GOAL_COINS }) }));
       body.appendChild(el('p', { class: 'why' }, [el('b', { text: t('done.why') + ' ' }), document.createTextNode(tx(puzzle.explain))]));
       if (r.newCritter) body.appendChild(el('div', { class: 'newcritter' }, [
         icon(A.creature(lv.critter.look, { cls: 'pop' }), 'critterico'),

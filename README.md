@@ -150,3 +150,9 @@ Also: oval **EN | BM** switch, **Pal Park** (pet, treat, play with, and take a p
 - Language button in the pause menu (restarts the level in the new language).
 - Bahasa Melayu: pals are now "Peneman" (online friends stay "Kawan").
 - The island chest opens on the level-complete card when the last level is finished.
+
+## v0.10.0
+- Day-streak flame (map header, menu, Streak screen). Login streak now also counts days in a row (run), and streak freezes (max 2) cover missed days.
+- Chests: coins plus one fixed-per-island surprise (bonus coins, 5-minute double-coins boost, streak freeze, or an unowned hat/accessory).
+- Daily goal: 3 levels a day, +15 coins once.
+- Map pals are smaller and no longer cover levels; dark counterparts generated for every light background (contrast scan over all screens and dialogs).

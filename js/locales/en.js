@@ -252,7 +252,6 @@
     "dash.rank.3": "Master",
     "streak.title": "Daily gift",
     "streak.chipReady": "Daily gift ready!",
-    "streak.chipDay": "Day {n} streak",
     "streak.day": "Day {n}",
     "streak.claim": "Claim {n} coins",
     "streak.claimed": "Today’s gift is collected. Come back tomorrow for more!",
@@ -336,6 +335,19 @@
     "set.hapticsOff": "Off",
     "chest.reach": "You reached the treasure chest!",
     "lvl.langNote": "Changing language restarts this level.",
+    "streak.flame": "{n} day streak",
+    "streak.saved": "A streak freeze saved your streak!",
+    "streak.freezes": "Streak freezes: {n}. A freeze covers one missed day.",
+    "chest.prize.coins": "Bonus: +{n} coins!",
+    "chest.prize.boost": "Double coins for 5 minutes!",
+    "chest.prize.freeze": "A streak freeze! It covers one missed day.",
+    "chest.prize.find": "New find: {name}!",
+    "boost.chip": "Double coins, {n} min left",
+    "done.boosted": "Double coins boost!",
+    "goal.title": "Daily goal",
+    "goal.n": "{a} of {b} levels today",
+    "goal.met": "Goal reached today!",
+    "goal.done": "Daily goal reached! +{n} coins",
     "map.levelN": "Level {n}:"
   });
 })();

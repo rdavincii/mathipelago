@@ -252,7 +252,6 @@
     "dash.rank.3": "Pakar",
     "streak.title": "Hadiah harian",
     "streak.chipReady": "Hadiah harian sedia!",
-    "streak.chipDay": "Rentetan hari ke-{n}",
     "streak.day": "Hari {n}",
     "streak.claim": "Tuntut {n} syiling",
     "streak.claimed": "Hadiah hari ini telah dituntut. Datang semula esok untuk lagi!",
@@ -336,6 +335,19 @@
     "set.hapticsOff": "Mati",
     "chest.reach": "Anda sampai ke peti harta karun!",
     "lvl.langNote": "Menukar bahasa memulakan semula tahap ini.",
+    "streak.flame": "Streak {n} hari",
+    "streak.saved": "Perlindungan streak menyelamatkan streak anda!",
+    "streak.freezes": "Perlindungan streak: {n}. Satu perlindungan menampung satu hari yang terlepas.",
+    "chest.prize.coins": "Bonus: +{n} syiling!",
+    "chest.prize.boost": "Syiling dua kali ganda selama 5 minit!",
+    "chest.prize.freeze": "Perlindungan streak! Ia menampung satu hari yang terlepas.",
+    "chest.prize.find": "Jumpaan baharu: {name}!",
+    "boost.chip": "Syiling dua kali ganda, baki {n} min",
+    "done.boosted": "Dorongan syiling dua kali ganda!",
+    "goal.title": "Matlamat harian",
+    "goal.n": "{a} daripada {b} tahap hari ini",
+    "goal.met": "Matlamat hari ini tercapai!",
+    "goal.done": "Matlamat harian tercapai! +{n} syiling",
     "map.levelN": "Tahap {n}:"
   });
 })();

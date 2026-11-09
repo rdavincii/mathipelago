@@ -50,12 +50,12 @@ def main():
         check('version: returning player sees a "new" note on the menu', pg.locator('.newbadge').count() == 1)
         js(pg, "MP.app.go('settings')"); pg.wait_for_timeout(300)
         txt = pg.locator('.about').inner_text()
-        check('version: settings shows the version number and what is new', '0.9.1' in txt and 'what' in txt.lower() and 'dark mode' in txt.lower(), txt[:200])
+        check('version: settings shows the version number and what is new', '0.10.0' in txt and 'what' in txt.lower() and 'flame' in txt.lower(), txt[:200])
         check('version: earlier updates are in a collapsible list', pg.locator('.about details.older').count() == 1)
         js(pg, "MP.app.go('menu')"); pg.wait_for_timeout(300)
         check('version: the note disappears once settings was opened', pg.locator('.newbadge').count() == 0)
         js(pg, "MP.store.update(s=>{s.lang='ms'}); MP.app.applySettings(); MP.app.go('settings')"); pg.wait_for_timeout(300)
-        check('version: update info is translated to Bahasa Melayu', 'mod gelap' in pg.locator('.about').inner_text().lower())
+        check('version: update info is translated to Bahasa Melayu', 'api streak' in pg.locator('.about').inner_text().lower())
         ctx.close()
 
         # ---------- daily gift ----------

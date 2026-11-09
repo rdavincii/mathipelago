@@ -6,6 +6,12 @@
   'use strict';
   var MP = (window.MP = window.MP || {});
   MP.changelog = [
+    { v: '0.10.0', date: '2026-11-09', items: [
+      { en: 'Day streak flame on the map and the menu. Streak freezes protect a missed day.', ms: 'Api streak harian pada peta dan menu. Perlindungan streak melindungi satu hari yang terlepas.' },
+      { en: 'Chests now hold coins plus a surprise: double coins for 5 minutes, a streak freeze, or a new hat or pal accessory.', ms: 'Peti kini mengandungi syiling serta kejutan: syiling dua kali ganda selama 5 minit, perlindungan streak, atau topi atau aksesori peneman baharu.' },
+      { en: 'Daily goal: finish 3 levels a day for a coin bonus.', ms: 'Matlamat harian: tamatkan 3 tahap sehari untuk bonus syiling.' },
+      { en: 'Your pal on the map is smaller and no longer hides the levels. Text in dark mode is fixed everywhere.', ms: 'Peneman anda di peta lebih kecil dan tidak lagi menutup tahap. Teks mod gelap dibaiki di semua tempat.' }
+    ] },
     { v: '0.9.1', date: '2026-11-09', items: [
       { en: 'Dark mode text is now readable everywhere, and every colour has enough contrast.', ms: 'Teks mod gelap kini mudah dibaca di semua tempat, dan setiap warna mempunyai kontras yang cukup.' },
       { en: 'Language button in the pause menu.', ms: 'Butang bahasa dalam menu jeda.' },

@@ -101,7 +101,7 @@ const used = new Set();
 ['js/app.js', 'js/puzzles.js', 'js/ui.js'].forEach(f => {
   const src = fs.readFileSync(path.join(root, f), 'utf8');
   (src.match(/\bt\('([a-zA-Z0-9_.]+)'/g) || []).forEach(m => used.add(m.slice(3, -1)));
-  (src.match(/'((?:fb|puz|lvl|done|adapt|tut|map|nav|menu|intro|lang|set|reset|col|hat|par|premium|demo|err|app|place|pals|dash|test|prof|acc|streak|find|ver|fr|chest)\.[a-zA-Z0-9.]+)'/g) || []).forEach(m => used.add(m.slice(1, -1)));
+  (src.match(/'((?:fb|puz|lvl|done|adapt|tut|map|nav|menu|intro|lang|set|reset|col|hat|par|premium|demo|err|app|place|pals|dash|test|prof|acc|streak|find|ver|fr|chest|goal|boost)\.[a-zA-Z0-9.]+)'/g) || []).forEach(m => used.add(m.slice(1, -1)));
 });
 const dynamic = ['pals.bond.0', 'pals.bond.1', 'pals.bond.2', 'pals.bond.3', 'pals.bond.4', 'pals.bond.5', 'pals.hello.0', 'pals.hello.1', 'pals.hello.2', 'pals.hello.3', 'pals.hello.4', 'pals.hello.5',
   'pals.pet.1', 'pals.pet.2', 'pals.pet.3', 'pals.feed.1', 'pals.feed.2', 'pals.play.1', 'pals.play.2', 'dash.rank.0', 'dash.rank.1', 'dash.rank.2', 'dash.rank.3', 'dash.skill.new', 'dash.skill.learning', 'dash.skill.growing', 'dash.skill.strong', 'band.explorer', 'band.adventurer', 'band.master', 'band.explorer.ages', 'band.adventurer.ages', 'band.master.ages', 'hat.sprout', 'hat.stargoggles', 'hat.captain', 'hat.rainbow', 'acc.party', 'acc.bow', 'acc.flower', 'acc.glasses', 'acc.bandana', 'acc.goggles', 'acc.hat', 'acc.scarf', 'acc.tophat', 'acc.headphones', 'acc.leafcrown', 'acc.halo', 'acc.wizard', 'acc.crown']
@@ -207,6 +207,17 @@ MP.entitlements.startCheckout('crystal-caves').then(r => {
   t('streak: a clock set backwards never pays or resets', back.state === 'claimed');
   t('streak: month and year boundaries count as consecutive days', S.status({ day: 2, last: '2026-02-28', best: 2, weeks: 0, total: 2 }, '2026-03-01').day === 3 && S.status({ day: 4, last: '2025-12-31', best: 4, weeks: 0, total: 4 }, '2026-01-01').day === 5);
   t('streak: garbage dates fall back to a fresh start', S.status({ day: 5, last: 'nope', best: 5, weeks: 0, total: 5 }, d(3)).day === 1);
+  /* streak freezes + the flame count */
+  r = S.claim({ day: 3, last: d(1), best: 3, weeks: 0, total: 3, run: 3 }, d(3), 1);
+  t('streak: one freeze covers one missed day and the week carries on', r.day === 4 && r.used === 1 && r.st.run === 5 && r.restarted === false, r);
+  r = S.claim({ day: 3, last: d(1), best: 3, weeks: 0, total: 3, run: 3 }, d(4), 1);
+  t('streak: a freeze that is not enough does not save the streak', r.day === 1 && r.used === 0 && r.restarted === true && r.st.run === 1, r);
+  t('streak: no freeze, no save', S.claim({ day: 3, last: d(1), best: 3, weeks: 0, total: 3, run: 3 }, d(3), 0).day === 1);
+  t('streak: the flame counts days in a row, past 7', S.count({ day: 2, last: d(5), best: 9, weeks: 1, total: 9, run: 9 }, d(5), 0).n === 9 && S.count({ day: 2, last: d(5), best: 9, weeks: 1, total: 9, run: 9 }, d(5), 0).safe === true);
+  t('streak: the flame is alive but not safe the day after, and out after a gap', S.count({ day: 2, last: d(5), run: 9 }, d(6), 0).alive === true && S.count({ day: 2, last: d(5), run: 9 }, d(6), 0).safe === false && S.count({ day: 2, last: d(5), run: 9 }, d(8), 0).alive === false && S.count({ day: 2, last: d(5), run: 9 }, d(7), 1).alive === true);
+  t('streak: claiming builds the run count', S.claim({ day: 2, last: d(5), best: 2, weeks: 0, total: 2, run: 2 }, d(6), 0).st.run === 3 && S.claim(S.blank(), d(1), 0).st.run === 1);
+  const svx = MP.store.sanitize({ freezes: 9, boostUntil: 'x', goal: { day: 'bad', n: -3, paid: 'yes' }, streak: { day: 2, last: '2026-03-04', run: 5 } });
+  t('storage: freezes are capped at 2, bad boost and goal are cleaned, run survives', svx.freezes === 2 && svx.boostUntil === 0 && svx.goal.day === null && svx.goal.n === 0 && svx.goal.paid === false && svx.streak.run === 5, svx);
   const sv = MP.store.sanitize({ streak: { day: 99, last: 'x', best: -4, weeks: 'a', total: 3 }, seenVersion: '<b>' });
   t('streak: saved streak is sanitised', sv.streak.day === 0 && sv.streak.last === null && sv.streak.best === 0 && sv.seenVersion === '');
   const sv2 = MP.store.sanitize({ streak: { day: 4, last: '2026-03-04', best: 5, weeks: 2, total: 20 }, seenVersion: '0.5.0' });
