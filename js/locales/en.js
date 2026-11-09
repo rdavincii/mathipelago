@@ -334,6 +334,8 @@
     "set.haptics": "Vibration (Android phones)",
     "set.hapticsOn": "On",
     "set.hapticsOff": "Off",
+    "chest.reach": "You reached the treasure chest!",
+    "lvl.langNote": "Changing language restarts this level.",
     "map.levelN": "Level {n}:"
   });
 })();

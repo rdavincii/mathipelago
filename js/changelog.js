@@ -6,6 +6,12 @@
   'use strict';
   var MP = (window.MP = window.MP || {});
   MP.changelog = [
+    { v: '0.9.1', date: '2026-11-09', items: [
+      { en: 'Dark mode text is now readable everywhere, and every colour has enough contrast.', ms: 'Teks mod gelap kini mudah dibaca di semua tempat, dan setiap warna mempunyai kontras yang cukup.' },
+      { en: 'Language button in the pause menu.', ms: 'Butang bahasa dalam menu jeda.' },
+      { en: 'In Bahasa Melayu, pals are now called Peneman.', ms: 'Dalam Bahasa Melayu, \u201cpals\u201d kini dipanggil Peneman.' },
+      { en: 'The treasure chest opens right after the last level of an island, no trip back to the map.', ms: 'Peti harta karun dibuka sejurus selepas tahap terakhir sebuah pulau, tanpa perlu kembali ke peta.' }
+    ] },
     { v: '0.9.0', date: '2026-11-09', items: [
       { en: 'A new path map: round level buttons wind down the screen, with a coloured banner for each island.', ms: 'Peta laluan baharu: butang tahap bulat meliuk ke bawah skrin, dengan sepanduk berwarna untuk setiap pulau.' },
       { en: 'Treasure chests: finish every level on an island, then open its chest for coins.', ms: 'Peti harta karun: tamatkan semua tahap di sebuah pulau, kemudian buka petinya untuk syiling.' },
@@ -21,13 +27,13 @@
       { en: 'Fixed the map animations freezing on slower phones.', ms: 'Membaiki animasi peta yang tersekat pada telefon yang lebih perlahan.' }
     ] },
     { v: '0.6.0', date: '2026-11-02', items: [
-      { en: 'Online friends: share a friend code, see each other\u2019s stars and pals, and send cheers that give coins. A grown-up turns it on.', ms: 'Kawan dalam talian: kongsi kod kawan, lihat bintang dan kawan masing-masing, dan hantar sorakan yang memberi syiling. Orang dewasa menghidupkannya.' },
+      { en: 'Online friends: share a friend code, see each other\u2019s stars and pals, and send cheers that give coins. A grown-up turns it on.', ms: 'Kawan dalam talian: kongsi kod kawan, lihat bintang dan peneman masing-masing, dan hantar sorakan yang memberi syiling. Orang dewasa menghidupkannya.' },
       { en: 'Smoother, springier motion: presses, pop-ups and screens now move like a native app.', ms: 'Gerakan lebih lancar dan melantun: tekanan, tetingkap dan skrin kini bergerak seperti aplikasi asli.' }
     ] },
     { v: '0.5.0', date: '2026-10-21', items: [
       { en: 'Daily gift: log in each day for more coins, with a Perfect Week bonus on day 7.', ms: 'Hadiah harian: log masuk setiap hari untuk lebih banyak syiling, dengan bonus Minggu Sempurna pada hari ke-7.' },
       { en: '100 new levels on 10 new islands, up to 312 levels in all.', ms: '100 tahap baharu di 10 pulau baharu, sehingga 312 tahap kesemuanya.' },
-      { en: 'Hats and pal accessories are now found by finishing levels, not bought.', ms: 'Topi dan aksesori kawan kini ditemui dengan menamatkan tahap, bukan dibeli.' },
+      { en: 'Hats and pal accessories are now found by finishing levels, not bought.', ms: 'Topi dan aksesori peneman kini ditemui dengan menamatkan tahap, bukan dibeli.' },
       { en: 'The map path is now a curvy dashed trail.', ms: 'Laluan peta kini ialah denai putus-putus yang melengkung.' },
       { en: 'Sound is more reliable: it wakes up again after a phone call, a lock screen or switching apps.', ms: 'Bunyi lebih dipercayai: ia hidup semula selepas panggilan telefon, skrin kunci atau menukar aplikasi.' },
       { en: 'Version and update info in Settings.', ms: 'Maklumat versi dan kemas kini dalam Tetapan.' }
@@ -38,7 +44,7 @@
       { en: 'Skills you have learned are shown on the dashboard.', ms: 'Kemahiran yang telah dipelajari ditunjukkan pada papan pemuka.' }
     ] },
     { v: '0.3.0', date: '2026-10-07', items: [
-      { en: 'Players (profiles) with backups, and pal dress-up.', ms: 'Pemain (profil) dengan sandaran, dan pakaian untuk kawan.' }
+      { en: 'Players (profiles) with backups, and pal dress-up.', ms: 'Pemain (profil) dengan sandaran, dan pakaian untuk peneman.' }
     ] }
   ];
 })();

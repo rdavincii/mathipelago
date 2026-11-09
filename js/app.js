@@ -461,7 +461,7 @@
       '<g class="chestlid"><path d="M8 30 Q8 8 40 8 Q72 8 72 30 Z" fill="#ffc800" stroke="#e5a800" stroke-width="3"/><rect x="8" y="26" width="64" height="6" fill="#e5a800"/><rect x="34" y="24" width="12" height="14" rx="3" fill="#fff" stroke="#e5a800" stroke-width="2"/></g></svg>';
   }
   function islandStars(isl) { var n = 0; MP.levels.byIsland(isl.id).forEach(function (l) { var r = levelRec(l.id); if (r && r.done) n += r.stars; }); return n; }
-  function openChest(isl) {
+  function chestBox(isl) {
     var coins = 10 + islandStars(isl), box = el('div', { class: 'chestbox' }), pic = el('div', { class: 'chestpic shake', svg: chestSvg() }), msg = el('p', { class: 'chestmsg', attrs: { role: 'status', 'aria-live': 'polite' }, text: '' });
     var open = btn('primary big', t('chest.openBtn'), function () {
       open.disabled = true; pic.classList.remove('shake'); pic.classList.add('opened');
@@ -472,7 +472,12 @@
       open.hidden = true; if (current.name === 'map') { var cb = document.querySelector('[data-chest="' + isl.id + '"]'); if (cb) { cb.classList.remove('ready'); cb.classList.add('done'); cb.setAttribute('aria-label', t('chest.title') + ' — ' + t('chest.opened')); } }
     });
     box.appendChild(pic); box.appendChild(msg); box.appendChild(open);
-    MP.ui.dialog({ title: t('chest.title'), body: box, cls: 'chestdlg', buttons: [{ label: t('chest.close'), cls: 'ghost' }] });
+    return box;
+  }
+  function openChest(isl) { MP.ui.dialog({ title: t('chest.title'), body: chestBox(isl), cls: 'chestdlg', buttons: [{ label: t('chest.close'), cls: 'ghost' }] }); }
+  function chestWaiting(islandId) {
+    var lvs = MP.levels.byIsland(islandId);
+    return !S.get().chests[islandId] && lvs.length > 0 && lvs.every(function (l) { return isDone(l.id); });
   }
 
   SCREENS.map = function (p, scope) {
@@ -695,6 +700,7 @@
       });
       if (r.kind === 'struggle') body.appendChild(el('p', { class: 'adaptnote', text: t('adapt.afterStruggle') }));
       else if (r.kind === 'clean') body.appendChild(el('p', { class: 'adaptnote', text: t('adapt.afterClean') }));
+      if (chestWaiting(lv.island)) body.appendChild(el('div', { class: 'newcritter chestwin' }, [el('b', { text: t('chest.reach') }), chestBox({ id: lv.island })]));
       if (next && r.first) body.appendChild(el('p', { class: 'unlocked', text: t('done.unlocked', { name: tx(next.title) }) }));
       var buttons = [];
       buttons.push({ label: last ? t('done.finish') : t('done.next'), cls: 'primary big', onClick: function () { if (last) go('demodone'); else go('level', { id: next.id }); } });
@@ -706,7 +712,8 @@
     function pause() {
       MP.ui.dialog({
         title: t('lvl.paused'),
-        body: el('div', { class: 'pausebody' }, [el('p', { text: t('lvl.pausedBody') }), el('div', { class: 'pausesound' }, [soundToggle(), el('span', { text: t('set.soundToggle') })])]),
+        body: el('div', { class: 'pausebody' }, [el('p', { text: t('lvl.pausedBody') }), el('div', { class: 'pausesound' }, [soundToggle(), el('span', { text: t('set.soundToggle') })]),
+          el('div', { class: 'pauselang' }, [btn('small', MP.i18n.lang === 'ms' ? 'English' : 'Bahasa Melayu', function () { S.update(function (v) { v.lang = MP.i18n.lang === 'ms' ? 'en' : 'ms'; }); applySettings(); rerender(); }, { lang: MP.i18n.lang === 'ms' ? 'en' : 'ms' }), el('small', { text: t('lvl.langNote') })])]),
         dismissable: true,
         buttons: [
           { label: t('lvl.resume'), cls: 'primary big' },

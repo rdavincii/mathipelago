@@ -1,7 +1,9 @@
 """v0.9.0: chest, vibration and dark mode. Needs a static server on :8123 (python3 -m http.server 8123)."""
-import json
+import json, ast
 from playwright.sync_api import sync_playwright
 res = []
+_src = open('tests/e2e.py').read(); _fn = [n for n in ast.parse(_src).body if isinstance(n, ast.FunctionDef) and n.name == 'solve'][0]
+_ns = {}; exec(ast.get_source_segment(_src, _fn), {'js': lambda pg, e, a=None: pg.evaluate(e, a) if a is not None else pg.evaluate(e)}, _ns); solve = _ns['solve']
 def check(n, ok, d=''):
     res.append(bool(ok)); print(('PASS ' if ok else 'FAIL ') + n, '' if ok else d)
 with sync_playwright() as p:
@@ -29,5 +31,20 @@ with sync_playwright() as p:
     check('dark: light stays light', pg.evaluate("document.documentElement.dataset.theme") == 'light')
     saved = json.loads(pg.evaluate("JSON.stringify(MP.store.exportActive ? MP.store.exportActive() : MP.store.get())"))
     check('chest: opened chests are saved', 'meadow' in json.dumps(saved))
+    # the chest opens on the level-complete card, and the pause menu switches language
+    pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(400)
+    pg.evaluate("MP.store.update(s=>{s.introDone=true;s.tutorialDone=true;s.lang='en';var ls=MP.levels.byIsland('meadow'); ls.slice(0,-1).forEach(l=>{s.levels[l.id]={done:true,stars:3,plays:1,hints:0,wrong:0}})}); MP.app.go('level',{id:MP.levels.byIsland('meadow').slice(-1)[0].id})"); pg.wait_for_timeout(500)
+    if pg.locator('.storycard .btn.big').count(): pg.locator('.storycard .btn.big').click()
+    pg.wait_for_timeout(300)
+    pg.get_by_role('button', name='Pause').click(); pg.wait_for_timeout(200)
+    pg.get_by_role('button', name='Bahasa Melayu', exact=True).click(); pg.wait_for_timeout(500)
+    check('pause: the language button switches the game to Bahasa Melayu', pg.evaluate("MP.store.get().lang") == 'ms' and pg.locator('.levelscreen').count() == 1)
+    pg.evaluate("MP.store.update(s=>{s.lang='en'}); MP.app.applySettings()"); pg.evaluate("MP.app.go('level',{id:MP.levels.byIsland('meadow').slice(-1)[0].id})"); pg.wait_for_timeout(500)
+    if pg.locator('.storycard .btn.big').count(): pg.locator('.storycard .btn.big').click()
+    pg.wait_for_timeout(300)
+    solve(pg); pg.wait_for_selector('.dialog-card.complete-card', timeout=8000)
+    check('chest: it appears on the complete card after the last level', pg.locator('.complete-card .chestpic').count() == 1)
+    pg.locator('.complete-card').get_by_role('button', name='Open!').click(); pg.wait_for_timeout(400)
+    check('chest: opened right there and paid', pg.evaluate("MP.store.get().chests.meadow") is True and pg.locator('.complete-card .chestmsg.show').count() == 1)
     b.close()
 print(json.dumps({'passed': sum(res), 'failed': len(res) - sum(res)}))

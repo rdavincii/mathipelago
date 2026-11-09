@@ -603,3 +603,35 @@ h1, h2, h3 { font-weight: 800; }
 [data-theme="dark"] .btn.node.locked { color: #6b7b84; }
 .nl-range::-webkit-slider-runnable-track { background: var(--lineD); } .nl-range::-moz-range-track { background: var(--lineD); }
 .chestico svg, .chestpic svg { overflow: visible; }
+
+.pauselang { display: grid; justify-items: center; gap: 4px; margin-top: 10px; } .pauselang small { color: var(--ink2); }
+.complete .chestwin { display: grid; justify-items: center; text-align: center; gap: 4px; } .complete .chestpic svg { width: 96px; height: 88px; }
+
+/* ---- v0.9.1 readability: enough contrast on every colour, in light and dark ---- */
+.btn.primary { background: #3a8500; border-color: #3a8500; border-bottom-color: #2a6000; } .btn.primary:hover:not(:disabled) { background: #347a00; }
+.btn.newbadge { background: #d93636; }
+.ptag, .ribbon { background: #8d3fd1; color: #fff; }
+.unit .islandname:not(.locked), .unit .islandname:not(.locked) small, .btn.node:not(.locked), .btn.node:not(.locked) .num { color: #10252c; text-shadow: none; }
+.unit .node.done .num { text-shadow: none; }
+.unit .islandname.locked, .unit .islandname.locked small { color: var(--ink2); }
+.startbubble { color: var(--ink); }
+.pillinner .lp.on { color: var(--bg); }
+[data-theme="dark"] .profilechip { background: var(--card); color: var(--ink); } [data-theme="dark"] .profilechip .pchipin b { color: #49c0f8; }
+[data-theme="dark"] .btn.critter.locked { background: var(--paper2); color: var(--ink2); }
+[data-theme="dark"] .notice { background: #3a3414; color: var(--ink); }
+[data-theme="dark"] .giftbtn { background: var(--card); color: var(--ink); } [data-theme="dark"] .giftbtn.ready { background: #ffc800; color: #10252c; border-color: #e5a800; }
+[data-theme="dark"] .daytile { background: var(--card); color: var(--ink); } [data-theme="dark"] .daytile.big { background: #3a3414; } [data-theme="dark"] .daytile.done { background: #1d3514; }
+[data-theme="dark"] .daytile.today { background: #ffc800; color: #10252c; } [data-theme="dark"] .daytile.today em { color: #7a3a00; } [data-theme="dark"] .daytile em { color: #ffb070; } [data-theme="dark"] .daytile .tick { color: #7be08f; }
+[data-theme="dark"] .lvl { background: var(--card); color: var(--ink); } [data-theme="dark"] .lvl.strong { background: #1d3514; } [data-theme="dark"] .lvl.growing { background: #3a3414; } [data-theme="dark"] .lvl.learning { background: #44261a; }
+[data-theme="dark"] .nl-ticks, [data-theme="dark"] .nl-ticks * { color: var(--ink); }
+.badge, .skrank { background: #3c3c3c; color: #fff; } .skill.r0 .skrank { background: #6b6785; } [data-theme="dark"] .badge, [data-theme="dark"] .skrank { background: #4a5a63; }
+[data-theme="dark"] .skill.r0 .skrank { background: #5a566f; }
+:root { --ink2: #5c5c5c; } :root[data-theme="dark"] { --ink2: #b4c0c8; }
+.btn { color: #0b73a8; } [data-theme="dark"] .btn { color: #49c0f8; } .btn.primary, [data-theme="dark"] .btn.primary { color: #fff; }
+.btn.ghost, .btn.danger { color: var(--ink2); } .btn.danger { color: #c62828; } [data-theme="dark"] .btn.danger { color: #ff7b7b; }
+.btn.on { color: #0b73a8; } [data-theme="dark"] .btn.on { color: #49c0f8; } .giftbtn.ready { color: #10252c; }
+.unit .islandname.locked { background: var(--line); }
+.btn[aria-pressed="true"].lang, .btn[aria-pressed="true"].segbtn, .btn[aria-pressed="true"].rank { color: #0b73a8; }
+[data-theme="dark"] .btn[aria-pressed="true"].lang, [data-theme="dark"] .btn[aria-pressed="true"].segbtn, [data-theme="dark"] .btn[aria-pressed="true"].rank { color: #49c0f8; }
+.btn.critter.locked { color: var(--ink2); }
+.coins, .chestmsg { color: #8a5a00; } [data-theme="dark"] .coins, [data-theme="dark"] .chestmsg { color: var(--gold); }

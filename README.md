@@ -144,3 +144,9 @@ Also: oval **EN | BM** switch, **Pal Park** (pet, treat, play with, and take a p
 - Duolingo-style vertical path map, one coloured banner per island, tap-to-open treasure chest at each island's end (10 coins + the island's stars, once).
 - Dark mode (Settings > Look: Auto/Light/Dark).
 - Vibration feedback via navigator.vibrate (Android browsers only; iPhones ignore it). Fires for correct, wrong, win, unlock, coin and chest sounds, never for plain taps. Setting: Vibration.
+
+## v0.9.1
+- Dark-mode and light-mode contrast pass (all text 4.5:1 or better, large text 3:1).
+- Language button in the pause menu (restarts the level in the new language).
+- Bahasa Melayu: pals are now "Peneman" (online friends stay "Kawan").
+- The island chest opens on the level-complete card when the last level is finished.
