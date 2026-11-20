@@ -187,6 +187,24 @@ MP.entitlements.startCheckout('crystal-caves').then(r => {
 
 
 
+/* ---------- PWA: manifest, icons, service worker ---------- */
+{
+  const rd = f => fs.readFileSync(path.join(root, f), 'utf8');
+  const man = JSON.parse(rd('manifest.webmanifest'));
+  t('pwa: manifest has a name, standalone display, a start page inside its scope', man.name && man.short_name && man.display === 'standalone' && man.start_url === './index.html' && man.scope === './');
+  const png = f => { const b = fs.readFileSync(path.join(root, f)); return b.slice(0, 8).toString('hex') === '89504e470d0a1a0a' ? [b.readUInt32BE(16), b.readUInt32BE(20)] : null; };
+  t('pwa: 192 and 512 icons exist at their stated sizes, plus a maskable one', man.icons.every(i => { const d = png(i.src); return d && i.sizes === d[0] + 'x' + d[1]; }) && man.icons.some(i => i.sizes === '192x192') && man.icons.some(i => i.sizes === '512x512' && i.purpose === 'maskable'));
+  t('pwa: the iPhone home-screen icon exists', (png('icons/apple-touch-icon.png') || [])[0] === 180);
+  const html = rd('index.html'), sw = rd('sw.js');
+  t('pwa: index.html links the manifest and the iPhone icon', /rel="manifest" href="manifest.webmanifest"/.test(html) && /rel="apple-touch-icon"/.test(html));
+  const shell = JSON.parse(sw.match(/var SHELL = (\[[\s\S]*?\]);/)[1].replace(/'/g, '"'));
+  const need = (html.match(/<script src="([^"]+)"/g) || []).map(x => x.match(/"([^"]+)"/)[1]).concat(['css/style.css', 'manifest.webmanifest', 'index.html']);
+  t('pwa: the offline cache lists every script, the stylesheet and the manifest', need.every(f => shell.includes(f)), need.filter(f => !shell.includes(f)));
+  t('pwa: every cached file exists on disk', shell.every(f => f === './' || fs.existsSync(path.join(root, f))), shell.filter(f => f !== './' && !fs.existsSync(path.join(root, f))));
+  t('pwa: the cache name carries the app version, so a release refreshes it', sw.includes("var CACHE = 'mathipelago-" + MP.config.version + "'"));
+  t('pwa: the service worker leaves other origins (online friends) alone', /url\.origin !== self\.location\.origin\) return;/.test(sw));
+}
+
 /* ---------- daily login streak ---------- */
 {
   const S = MP.streak, d = n => '2026-03-' + String(n).padStart(2, '0');

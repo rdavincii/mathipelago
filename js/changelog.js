@@ -6,6 +6,9 @@
   'use strict';
   var MP = (window.MP = window.MP || {});
   MP.changelog = [
+    { v: '0.11.0', date: '2026-11-21', items: [
+      { en: 'Install Mathipelago like an app: add it to your home screen. It now has its own icon and works offline.', ms: 'Pasang Mathipelago seperti aplikasi: tambahkannya ke skrin utama. Kini ia mempunyai ikon sendiri dan berfungsi tanpa internet.' }
+    ] },
     { v: '0.10.0', date: '2026-11-09', items: [
       { en: 'Day streak flame on the map and the menu. Streak freezes protect a missed day.', ms: 'Api streak harian pada peta dan menu. Perlindungan streak melindungi satu hari yang terlepas.' },
       { en: 'Chests now hold coins plus a surprise: double coins for 5 minutes, a streak freeze, or a new hat or pal accessory.', ms: 'Peti kini mengandungi syiling serta kejutan: syiling dua kali ganda selama 5 minit, perlindungan streak, atau topi atau aksesori peneman baharu.' },

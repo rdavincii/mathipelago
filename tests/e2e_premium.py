@@ -10,7 +10,7 @@ from playwright.sync_api import sync_playwright
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8123/index.html'
 
 def page(b, w=360, h=640, free=False):
-    ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, has_touch=True, is_mobile=True)
+    ctx = b.new_context(service_workers='block', viewport={'width': w, 'height': h}, device_scale_factor=2, has_touch=True, is_mobile=True)
     pg = ctx.new_page(); pg.problems = []; pg.requests = []
     pg.on('console', lambda m: pg.problems.append(m.text) if m.type == 'error' else None)
     pg.on('pageerror', lambda e: pg.problems.append('PAGEERROR ' + str(e)))

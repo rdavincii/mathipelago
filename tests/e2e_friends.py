@@ -9,7 +9,7 @@ ID = '11111111-1111-1111-1111-111111111111'
 
 def main():
     with sync_playwright() as p:
-        b = p.chromium.launch(); ctx = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); pg = ctx.new_page()
+        b = p.chromium.launch(); ctx = b.new_context(service_workers='block', viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); pg = ctx.new_page()
         calls = []; state = {'friends': [{'id': '22222222-2222-2222-2222-222222222222', 'name': 'Aina', 'avatar': 'nimbo', 'stars': 40, 'levels': 15, 'pal': None, 'status': 'friend', 'cheered': False},
                                          {'id': '33333333-3333-3333-3333-333333333333', 'name': 'Hakim', 'avatar': 'nimbo', 'stars': 3, 'levels': 1, 'pal': None, 'status': 'incoming', 'cheered': False}], 'collect': 3}
         def h(route):

@@ -156,3 +156,10 @@ Also: oval **EN | BM** switch, **Pal Park** (pet, treat, play with, and take a p
 - Chests: coins plus one fixed-per-island surprise (bonus coins, 5-minute double-coins boost, streak freeze, or an unowned hat/accessory).
 - Daily goal: 3 levels a day, +15 coins once.
 - Map pals are smaller and no longer cover levels; dark counterparts generated for every light background (contrast scan over all screens and dialogs).
+
+## v0.11.0 - installable app (PWA)
+- manifest.webmanifest + sw.js + icons/ (made from the Nimbo artwork by tools/mkicons.py).
+- Works offline after the first visit. The service worker is cache-first and refreshes in the background, so an update shows on the second open.
+- It only runs over https (or localhost); opening index.html straight from a file is unchanged and has no offline cache.
+- **To ship a release:** bump MP.config.version AND the CACHE name in sw.js (unit tests fail if they differ), and add any new script/css file to SHELL in sw.js.
+- Install: Android/Chrome: menu > Install app. iPhone/iPad Safari: Share > Add to Home Screen. Desktop Chrome/Edge: install icon in the address bar.

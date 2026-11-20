@@ -10,7 +10,7 @@ from playwright.sync_api import sync_playwright
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8123/index.html'
 
 def page(b, w=390, h=844):
-    ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, has_touch=True, is_mobile=True)
+    ctx = b.new_context(service_workers='block', viewport={'width': w, 'height': h}, device_scale_factor=2, has_touch=True, is_mobile=True)
     pg = ctx.new_page(); pg.problems = []
     pg.on('console', lambda m: pg.problems.append(m.text) if m.type == 'error' else None)
     pg.on('pageerror', lambda e: pg.problems.append('PAGEERROR ' + str(e)))
@@ -50,12 +50,12 @@ def main():
         check('version: returning player sees a "new" note on the menu', pg.locator('.newbadge').count() == 1)
         js(pg, "MP.app.go('settings')"); pg.wait_for_timeout(300)
         txt = pg.locator('.about').inner_text()
-        check('version: settings shows the version number and what is new', '0.10.0' in txt and 'what' in txt.lower() and 'flame' in txt.lower(), txt[:200])
+        check('version: settings shows the version number and what is new', '0.11.0' in txt and 'what' in txt.lower() and 'install' in txt.lower(), txt[:200])
         check('version: earlier updates are in a collapsible list', pg.locator('.about details.older').count() == 1)
         js(pg, "MP.app.go('menu')"); pg.wait_for_timeout(300)
         check('version: the note disappears once settings was opened', pg.locator('.newbadge').count() == 0)
         js(pg, "MP.store.update(s=>{s.lang='ms'}); MP.app.applySettings(); MP.app.go('settings')"); pg.wait_for_timeout(300)
-        check('version: update info is translated to Bahasa Melayu', 'api streak' in pg.locator('.about').inner_text().lower())
+        check('version: update info is translated to Bahasa Melayu', 'pasang mathipelago' in pg.locator('.about').inner_text().lower())
         ctx.close()
 
         # ---------- daily gift ----------

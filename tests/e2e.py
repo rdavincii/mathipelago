@@ -141,7 +141,7 @@ def free_only(pg):
 def main():
     with sync_playwright() as p:
         b = p.chromium.launch()
-        ctx = b.new_context(viewport={'width': 360, 'height': 640}, device_scale_factor=2, has_touch=True, is_mobile=True)
+        ctx = b.new_context(service_workers='block', viewport={'width': 360, 'height': 640}, device_scale_factor=2, has_touch=True, is_mobile=True)
         pg = ctx.new_page(); free_only(pg)
         problems = []
         pg.on('console', lambda m: problems.append(m.text) if m.type == 'error' else None)

@@ -15,4 +15,6 @@
   window.addEventListener('error', function (e) { if (!window.MP || !window.MP.app || !document.getElementById('app').firstChild) fail(e.error || e.message); });
   function start() { try { Promise.resolve(window.MP.app.init()).catch(fail); } catch (e) { fail(e); } }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+  // Offline + install support. Only over http(s): a service worker cannot run from file://.
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () { /* the game works fine without it */ }); });
 })();

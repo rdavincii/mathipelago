@@ -7,7 +7,7 @@ _ns = {}; exec(ast.get_source_segment(_src, _fn), {'js': lambda pg, e, a=None: p
 def check(n, ok, d=''):
     res.append(bool(ok)); print(('PASS ' if ok else 'FAIL ') + n, '' if ok else d)
 with sync_playwright() as p:
-    b = p.chromium.launch(); pg = b.new_context(viewport={'width': 390, 'height': 844}).new_page()
+    b = p.chromium.launch(); pg = b.new_context(service_workers='block', viewport={'width': 390, 'height': 844}).new_page()
     pg.add_init_script("window.__v=[]; navigator.vibrate=function(p){window.__v.push(p);return true}")
     pg.goto('http://localhost:8123/index.html'); pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(400)
     pg.evaluate("MP.store.update(s=>{s.introDone=true;s.tutorialDone=true;s.lang='en';MP.levels.byIsland('meadow').forEach(l=>{s.levels[l.id]={done:true,stars:3,plays:1,hints:0,wrong:0}})}); MP.app.go('map')"); pg.wait_for_timeout(600)

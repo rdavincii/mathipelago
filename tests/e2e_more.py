@@ -23,7 +23,7 @@ def start_level(pg, lid):
     pg.wait_for_timeout(200)
 
 def new_page(b, w=360, h=640, **kw):
-    ctx = b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, has_touch=True, is_mobile=(w < 700), **kw)
+    ctx = b.new_context(service_workers='block', viewport={'width': w, 'height': h}, device_scale_factor=2, has_touch=True, is_mobile=(w < 700), **kw)
     pg = ctx.new_page(); pg.problems = []
     if not os.environ.get('TESTMODE'):      # default: behave like the public free demo; TESTMODE=1 keeps premium test packs on
         def _h(route):
